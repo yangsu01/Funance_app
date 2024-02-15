@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Simulation Rules{% endblock %} 
+
+{% block content%}
+    <div class="container my-5">
+        <div class="p-5 bg-body-tertiary rounded-3">
+            <h1 class="text-body-emphasis text-center">Portfolio simulation game rules</h1>
+            <h5 class="text-center">Create an investment portfolio and watch it grow! <br><br></h5>
+            <p class="lead">
+                You will be given some starting funds <small>(this money is fake and cannot be withdrawn)</small> to invest in the financial market. Currently, this only includes equity investments (aka stocks). Fixed income assets such as bonds and derivatives such as options are not included (yet???). Also, no shorting. ETFs are allowed as long as it is traded on a stock market. <br><br>
+                
+                Track your performance over time and Buy/Sell your way to victory! Assert your finance bro dominance by out-performing other peoples portfolios! <br> <br>
+
+                To get started, just sign up (if you haven't already) and create your profile! <br>
+            </p>
+            <p class="lead d-flex justify-content-center">
+                <b>Details:</b><br>
+                - Start with ${{ starting_funds }} USD <br>
+                - No comissions or fees when buying/selling <br>
+                - No partial shares allowed <br>
+                - Trades are assumed to be instant, and will be executed at quoted price.<br>
+                - If buying/selling after market close, closing price will be used.<br>
+            </p>
+        </div>
+    </div>
+{% endblock %}
