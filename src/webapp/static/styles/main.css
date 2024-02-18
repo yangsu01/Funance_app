@@ -1,3 +1,18 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin:0;
+}
+
+.content {
+    flex: 1;
+}
+
+.footer {
+    background-color: inherit;
+}
+
 .form-login {
     max-width: 330px;
     padding: 1rem;
@@ -6,4 +21,22 @@
 .form-signup {
     max-width: 500px;
     padding: 1rem;
+}
+
+.form-mini {
+    max-width: 330px;
+    padding: 1rem;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.button-container button {
+    min-width: 100px;
+}
+
+.button-container a {
+    min-width: 100px;
 }
