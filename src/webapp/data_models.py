@@ -11,7 +11,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), unique=True, nullable=False)
     creation_date = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
     # one to one
-    portfolio = db.relationship('Portfolio', backref='user', lazy=True)
+    portfolio = db.relationship('Portfolio', back_populates='user', uselist=False)
 
 
 class Portfolio(db.Model):
@@ -19,6 +19,9 @@ class Portfolio(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     available_cash = db.Column(db.Float, nullable=False)
     creation_date = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
+    # one to one
+    user = db.relationship('User', back_populates='portfolio')
+
     # one to many
     holdings = db.relationship('Holdings', backref='portfolio', lazy=True)
     transactions = db.relationship('Transactions', backref='portfolio', lazy=True)
