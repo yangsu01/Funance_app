@@ -1,4 +1,3 @@
-
 // on page load
 document.addEventListener('DOMContentLoaded', () => {
     let dataContainer = document.getElementById('data-container')
@@ -12,12 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (holdingsData.length > 0) {
-        renderHoldingsTable(holdingsData)
+        renderTable(holdingsData, 'holdingsTable')
     }
 
     if (transactionData.length > 0) {
-        renderTransactionTable(transactionData)
+        renderTable(transactionData, 'transactionsTable')
     }
+
 })
 
 
@@ -40,28 +40,31 @@ let renderHistoryPlot = (data) => {
 
 
 /**
- * Renders the holdings table
- * @param {JSON} data - holdings data
- */
-let renderHoldingsTable = (data) => {
-
-}
-
-
-/**
- * Renders the transaction table
+ * Renders a table in html
  * @param {JSON} data - transaction data
  */
-let renderTransactionTable = (data) => {
-    let table = $('#transactionTable')
+let renderTable = (data, tableId) => {
+    let table = $(`#${tableId}`)
+    let thead = $('<thead>')
+    let tbody = $('<tbody>')
+    let tr = $('<tr>')
 
+    // append headers
+    tr.append($('<th scope="col">').text('#'))
+    $.each(data[0], (key, value) => {
+        tr.append($('<th scope="col">').text(key))   
+    })
+    thead.append(tr)
+    table.append(thead)
+
+    // append data
     $.each(data, (index, row) => {
-        let tr = $('<tr>')
+        tr = $('<tr>')
+        tr.append($('<th scope="row">').text(index + 1))
         $.each(row, (key, value) => {
             tr.append($('<td>').text(value))
         })
-        table.append(tr)
+        tbody.append(tr)
     })
-
-    console.log(data)
+    table.append(tbody)
 }

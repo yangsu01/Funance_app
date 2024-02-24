@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from datetime import datetime
 import pytz
@@ -8,7 +8,7 @@ import yfinance as yf
 
 
 from . import db
-from .data_models import User, Portfolio, Holdings, Transactions
+from .data_models import Portfolio, Holdings, Transactions, History
 
 # constants
 STARTING_FUNDS = 10000.00
@@ -18,6 +18,7 @@ sim = Blueprint('sim', __name__)
 
 # routes
 @sim.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     if request.method == 'POST':
         # create portfolio form
@@ -35,13 +36,18 @@ def dashboard():
             except:
                 flash(f'Cannot find ticker {ticker}', category='error')
 
-    portfolio_exists = Portfolio.query.filter_by(user_id=current_user.id).first()
+    portfolio_exists = current_user.portfolio
 
     if portfolio_exists:
-        has_holdings = Holdings.query.filter_by(portfolio_id=current_user.portfolio.id).first()
-        has_transactions = Transactions.query.filter_by(portfolio_id=current_user.portfolio.id).first()
+        has_holdings = current_user.portfolio.holdings
+        has_transactions = current_user.portfolio.transactions
 
-        transactions, holdings, history = [], [], []
+        transactions, holdings = [], []
+
+        history = get_portfolio_history(current_user.portfolio.id)
+
+        if has_holdings:
+            holdings = get_portfolio_holdings(current_user.portfolio.id)
 
         if has_transactions:
             transactions = get_portfolio_transactions(current_user.portfolio.id)
@@ -50,8 +56,8 @@ def dashboard():
                         user=current_user, 
                         username=current_user.username, 
                         portfolio_exists=portfolio_exists, 
-                        time=datetime.now().strftime('%A, %B %d. %Y %I:%M %p %Z'),
-                        portfolio_value=100.02, # placeholder
+                        update_time=current_user.portfolio.updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z'),
+                        portfolio_value=current_user.portfolio.updated_value,
                         has_holdings=has_holdings, 
                         has_transactions=has_transactions, 
                         available_cash=current_user.portfolio.available_cash,
@@ -74,6 +80,7 @@ def rules():
 
 
 @sim.route('/buy_stock/<ticker>', methods=['GET', 'POST'])
+@login_required
 def buy_stock(ticker: str):
     if request.method == 'POST':
         ticker = request.form['ticker']
@@ -81,9 +88,10 @@ def buy_stock(ticker: str):
         name = request.form['name']
         price = float(request.form['price'])
         currency = request.form['currency']
+        open = float(request.form['open'])
         
         record_buy_transaction(current_user.portfolio.id, ticker, name, shares, price, currency)
-        update_holdings(current_user.portfolio.id, ticker, name, shares, price)
+        update_holdings(current_user.portfolio.id, ticker, name, shares, price, currency, open)
         update_portfolio_cash(current_user.portfolio.id, shares*price)
 
         flash(f'Transaction complete!', category='success')
@@ -110,7 +118,7 @@ def create_portfolio(user_id: int) -> None:
         args:
             user_id: int - database id of the user
     '''
-    portfolio = Portfolio(user_id=user_id, available_cash=STARTING_FUNDS)
+    portfolio = Portfolio(user_id=user_id, available_cash=STARTING_FUNDS, updated_value=STARTING_FUNDS, updated_time=datetime.now())
 
     db.session.add(portfolio)
     db.session.commit()
@@ -133,6 +141,7 @@ def get_stock_info(ticker: str) -> dict:
         'company_summary': stock_info.get('longBusinessSummary', 'n/a'),
         'currency': stock_info.get('currency', 'n/a'),
         'company_name': stock_info.get('longName', 'n/a'),
+        'open': stock_info.get('open', 'n/a')
     }
 
     return parced_info
@@ -185,7 +194,7 @@ def record_buy_transaction(portfolio_id: int, ticker: str, name: str, shares: in
     db.session.commit()
 
 
-def update_holdings(portfolio_id: int, ticker: str, name: str, shares: int, price: float) -> None:
+def update_holdings(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str, open_price: float) -> None:
     '''Updates the stock holdings for a portfolio
         args:
             portfolio_id: int - database id of the portfolio
@@ -193,6 +202,8 @@ def update_holdings(portfolio_id: int, ticker: str, name: str, shares: int, pric
             name: str - stock name
             shares: int - number of shares
             price: float - price per share
+            currency: str - currency of the stock
+            open_price: float - opening price of the stock for the day
     '''
     holding = Holdings.query.filter_by(portfolio_id=portfolio_id, ticker=ticker).first()
 
@@ -200,15 +211,16 @@ def update_holdings(portfolio_id: int, ticker: str, name: str, shares: int, pric
         holding.average_price = round((holding.average_price*holding.shares + price*shares) / (holding.shares + shares), 2)
         holding.shares += shares
         holding.updated_price = round(price, 2)
-        holding.updated_time = datetime.now()
     else:
         holding = Holdings(portfolio_id=portfolio_id, 
                             name=name, 
                             ticker=ticker, 
                             shares=shares, 
                             average_price=round(price, 2), 
-                            updated_price=round(price, 2), 
-                            updated_time=datetime.now())
+                            updated_price=round(price, 2),
+                            currency=currency, 
+                            open_price=round(open_price, 2),
+                            open_price_date=datetime.today().date())
 
         db.session.add(holding)
     
@@ -229,19 +241,140 @@ def update_portfolio_cash(portfolio_id: int, transaction_cost: float) -> None:
     db.session.commit()
 
 
-def get_portfolio_transactions(portfolio_id: int) -> dict:
-    '''Gets all transactions for a portfolio and parses data into dataframe
+def get_portfolio_transactions(portfolio_id: int) -> str:
+    '''Gets all transactions in a portfolio and parses data into a json string
         args:
             portfolio_id: int - database id of the portfolio
         returns:
-            pd.DataFrame - all transactions for a portfolio
+            str - json string of transaction history of a portfolio
     '''
     transactions = Transactions.query.filter_by(portfolio_id=portfolio_id).all()
 
     df = pd.DataFrame([t.__dict__ for t in transactions])
-    # drop unnecessary columns
-    df = df.drop(columns=['_sa_instance_state', 'id', 'portfolio_id'])
-    # rearrange columns
-    df = df[['date', 'status', 'name', 'ticker', 'share_price', 'shares', 'total_value', 'currency']]
+
+    # rearrange and rename columns
+    df['date'] = df['date'].dt.strftime('%H:%M:%S %m-%d-%Y')    
+    df = df[['ticker', 'name', 'status', 'shares', 'share_price', 'total_value', 'currency', 'date']]
+    df = df.rename(columns={'ticker': 'Ticker',
+                            'name': 'Company Name',
+                            'status': 'Buy/Sell',
+                            'shares': 'Shares',
+                            'share_price': 'Price per Share',
+                            'total_value': 'Total Value',
+                            'currency': 'Currency',
+                            'date': 'Date'})
 
     return df.to_json(orient='records')
+
+
+def get_portfolio_holdings(portfolio_id: int) -> str:
+    '''Gets all holdings in a portfolio and parses data a json string
+            portfolio_id: int - database id of the portfolio
+        returns:
+            str - json string of all holdings in a portfolio
+    '''
+    holdings = Holdings.query.filter_by(portfolio_id=portfolio_id).all()
+
+    df = pd.DataFrame([h.__dict__ for h in holdings])
+
+    df['Change'] = round((df['updated_price'] - df['average_price']), 2)
+    df['Total Change'] = round((df['Change'] * df['shares']), 2)
+    df['% Change'] = round((df['Change'] / df['average_price']) * 100, 2)
+    df['Market Value'] = round((df['updated_price'] * df['shares']), 2)
+
+    # rearrange and rename columns
+    df = df[['ticker', 'name', 'shares', 'average_price', 'updated_price', 'Change', 'Total Change', '% Change', 'Market Value', 'currency']]
+    df = df.rename(columns={'ticker': 'Ticker',
+                            'name': 'Company Name',
+                            'shares': 'Shares',
+                            'average_price': 'Average Price',
+                            'updated_price': 'Current Price',
+                            'currency': 'Currency'})
+
+    return df.to_json(orient='records')
+
+
+def update_prices() -> None:
+    '''Updates the prices of all holdings in the database
+    Also updates the open price of the stock for the day if not already done
+    this is intended to run once an hour
+    '''
+    holdings = Holdings.query.all()
+    updated_prices = {}
+    update_open = False
+    
+    # check if open price hasnt been updated for today
+    open_date = holdings[0].open_price_date
+    if open_date != datetime.today().date():
+        open_prices = {}
+        update_open = True
+
+    for holding in holdings:
+        ticker = holding.ticker
+        if ticker not in updated_prices:
+            updated_prices[ticker] = yf.Ticker(ticker).info.get('currentPrice', holding.updated_price)
+
+            if update_open:
+                open_prices[ticker] = yf.Ticker(ticker).info.get('open', holding.open_price)
+
+        holding.updated_price = updated_prices[ticker]
+        if update_open:
+            holding.open_price = open_prices[ticker]
+            holding.open_price_date = datetime.today().date()
+
+    db.session.commit()
+
+
+def update_portfolio_value() -> None:
+    '''Updates the total value of all portfolios in the database
+    this is intended to run once an hour
+    '''
+    portfolios = Portfolio.query.all()
+
+    for portfolio in portfolios:
+        holdings = portfolio.holdings
+        updated_value = portfolio.available_cash
+
+        for holding in holdings:
+            updated_value += holding.updated_price * holding.shares
+
+        portfolio.updated_value = round(updated_value, 2)
+        portfolio.updated_time = datetime.now()
+
+    db.session.commit()
+
+
+def save_portfolio_value() -> None:
+    '''Saves the value of all portfolios in the database under the history table
+    this is intended to run at the end of each day
+    '''
+    portfolios = Portfolio.query.all()
+    value_updated = History.query.filter_by(date=datetime.today().date()).first()
+
+    if not value_updated:
+        for portfolio in portfolios:
+            history = History(portfolio_id=portfolio.id, date=datetime.today().date(), portfolio_value=portfolio.updated_value)
+
+            db.session.add(history)
+
+        db.session.commit()
+
+def get_portfolio_history(portfolio_id: int) -> str:
+    '''Gets the history of a portfolio and parses data into a json string
+        args:
+            portfolio_id: int - database id of the portfolio
+        returns:
+            str - json string of the history of a portfolio
+    '''
+    history = History.query.filter_by(portfolio_id=portfolio_id).all()
+
+    df = pd.DataFrame([h.__dict__ for h in history])
+
+    df = df.dropna()
+
+    # df['date'] = df['date'].dt.strftime('%m-%d-%Y')
+    # df = df.rename(columns={'date': 'Date', 'portfolio_value': 'Portfolio Value'})
+
+    for i in range(len(df)):
+        print(df['date'][i], df['id'][i], df['portfolio_value'][i], df['portfolio_id'][i])
+    # return df.to_json(orient='records')

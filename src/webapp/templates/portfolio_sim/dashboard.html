@@ -53,18 +53,19 @@
         <!-- portfolio value -->
         <div class="mt-4 mb-3 container">
             <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong></h2>
-            <h6 class="text-center"> As of <strong>{{ time }}</strong></h6>
+            <h6 class="text-center" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every hour"> 
+                <u>As of <strong>{{ update_time }}</strong></u>
+            </h6>
         </div>
         
         {% if has_holdings %}
             <!-- portfolio plot  -->
-            <canvas class="my-4 w-100" id="myChart" width="816" height="344" style="display: block; box-sizing: border-box; height: 275px; width: 652px;"></canvas>
+            <canvas class="my-4 w-100" id="portfolioPlot" width="816" height="344" style="display: block; box-sizing: border-box; height: 275px; width: 652px;"></canvas>
+            
             <!-- portfolio holdings -->
-            <h3>My Holdings</h3>
-            <div class="table-responsive small">
-                <table class="table table-striped table-sm" id="holdingsTable">
-                </table>
-            </div>
+            <h3>Portfolio Breakdown</h3>
+            <table class="table table-striped table-hover table-dark" id="holdingsTable">
+            </table>
         {% endif %}
 
         {% if has_transactions %}
@@ -72,7 +73,8 @@
                 <h3 class="text-center mt-5 mb-5">Your portfolio does not have any holdings!</h3>
             {% endif %}
             <!-- transaction history -->
-            <table class="table table-striped" id="transactionsTable">
+            <h3 class="mt-5">Transaction History</h3>
+            <table class="table table-striped table-hover table-dark" id="transactionsTable">
             </table>
         {% else %}
             <h1 class="text-center mt-5 mb-5">Buy something first to track your portfolio!</h1>
