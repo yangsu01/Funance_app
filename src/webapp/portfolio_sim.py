@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash
 from flask_login import current_user, login_required
 
+import json
 from datetime import datetime
 import pytz
 import pandas as pd
@@ -35,16 +36,22 @@ def dashboard():
                     flash(f'Cannot find ticker {ticker}', category='error')
             except:
                 flash(f'Cannot find ticker {ticker}', category='error')
+        elif 'sellDropdown' in request.form:
+            ticker = request.form['sellDropdown']
+            if ticker:
+                return redirect(url_for('sim.sell_stock', ticker=ticker))
+            else:
+                flash(f'Please select a stock to sell', category='error')
 
     portfolio_exists = current_user.portfolio
 
     if portfolio_exists:
         has_holdings = current_user.portfolio.holdings
         has_transactions = current_user.portfolio.transactions
-
         transactions, holdings = [], []
-
         history = get_portfolio_history(current_user.portfolio.id)
+
+        # save_portfolio_value()
 
         if has_holdings:
             holdings = get_portfolio_holdings(current_user.portfolio.id)
@@ -90,7 +97,7 @@ def buy_stock(ticker: str):
         currency = request.form['currency']
         open = float(request.form['open'])
         
-        record_buy_transaction(current_user.portfolio.id, ticker, name, shares, price, currency)
+        record_transaction(current_user.portfolio.id, ticker, 'buy', name, shares, price, currency)
         update_holdings(current_user.portfolio.id, ticker, name, shares, price, currency, open)
         update_portfolio_cash(current_user.portfolio.id, shares*price)
 
@@ -110,6 +117,36 @@ def buy_stock(ticker: str):
                             time=est_time, 
                             available_cash=available_cash,
                             max_shares=max_shares)
+
+
+@sim.route('/sell_stock/<ticker>', methods=['GET', 'POST'])
+@login_required
+def sell_stock(ticker: str):
+    if request.method == 'POST':
+        ticker = request.form['ticker']
+        shares = int(request.form['shares'])
+        name = request.form['name']
+        price = float(request.form['price'])
+        currency = request.form['currency']
+
+        record_transaction(current_user.portfolio.id, ticker, 'sell', name, shares, price, currency)
+        delete_holdings(current_user.portfolio.id, ticker, shares)
+        update_portfolio_cash(current_user.portfolio.id, -1*shares*price)
+
+        flash(f'Transaction complete!', category='success')
+
+        return redirect(url_for('sim.dashboard'))
+
+    current_price = get_current_price(ticker)
+    info = get_holding(current_user.portfolio.id, ticker)
+    details = calculate_holding_value(info['average_price'], current_price, info['shares'])
+
+    return render_template("portfolio_sim/sell.html", 
+                           user=current_user, 
+                           info=info,
+                           details=details, 
+                           current_price=current_price,
+                           time=get_est_time())
 
 
 # functions
@@ -170,24 +207,26 @@ def get_available_cash(user_id: int) -> float:
     return portfolio.available_cash
 
 
-def record_buy_transaction(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str) -> None:
-    '''Records a buy transaction in the database
+def record_transaction(portfolio_id: int, ticker: str, status: str, name: str, shares: int, price: float, currency: str) -> None:
+    '''Records a transaction in the database
         args:
             portfolio_id: int - database id of the portfolio
             ticker: str - stock ticker
+            status: str - buy/sell
             name: str - stock name
             shares: int - number of shares
             price: float - price per share
             currency: str - currency of the transaction
     '''
     transaction = Transactions(portfolio_id=portfolio_id, 
-                                status='buy', 
+                                status=status, 
                                 name=name, 
                                 ticker=ticker, 
                                 currency=currency, 
                                 shares=shares, 
                                 share_price=round(price, 2), 
-                                total_value=round(shares*price, 2)
+                                total_value=round(shares*price, 2),
+                                date=datetime.now()
                                 )
 
     db.session.add(transaction)
@@ -359,6 +398,7 @@ def save_portfolio_value() -> None:
 
         db.session.commit()
 
+
 def get_portfolio_history(portfolio_id: int) -> str:
     '''Gets the history of a portfolio and parses data into a json string
         args:
@@ -368,13 +408,76 @@ def get_portfolio_history(portfolio_id: int) -> str:
     '''
     history = History.query.filter_by(portfolio_id=portfolio_id).all()
 
-    df = pd.DataFrame([h.__dict__ for h in history])
+    portfolio_history = {
+        'Date': [h.date.strftime('%Y-%m-%d') for h in history],
+        'Value': [h.portfolio_value for h in history]
+    }
 
-    df = df.dropna()
+    return json.dumps(portfolio_history)
 
-    # df['date'] = df['date'].dt.strftime('%m-%d-%Y')
-    # df = df.rename(columns={'date': 'Date', 'portfolio_value': 'Portfolio Value'})
 
-    for i in range(len(df)):
-        print(df['date'][i], df['id'][i], df['portfolio_value'][i], df['portfolio_id'][i])
-    # return df.to_json(orient='records')
+def get_holding(portfolio_id: int, ticker: str) -> dict:
+    '''Gets a specific holding from a portfolio. Assumes holding exists
+        args:
+            portfolio_id: int - database id of the portfolio
+            ticker: str - stock ticker
+        returns:
+            dict - holding information
+    '''
+    holding = Holdings.query.filter_by(portfolio_id=portfolio_id, ticker=ticker).first()
+
+    return {
+        'ticker': holding.ticker,
+        'name': holding.name,
+        'shares': holding.shares,
+        'average_price': holding.average_price,
+        'updated_price': holding.updated_price,
+        'currency': holding.currency
+    }
+
+
+def get_current_price(ticker: str) -> float:
+    '''Gets the current price of a stock
+        args:
+            ticker: str - stock ticker
+        returns:
+            float - current price of the stock
+    '''
+    return yf.Ticker(ticker).info.get('currentPrice', 'n/a')
+
+
+def calculate_holding_value(average_price: float, current_price: float, shares: int) -> dict:
+    '''Calculates the current value of a stock holding and other metrics
+        args:
+            average_price: float - average price of the stock
+            current_price: float - current price of the stock
+            shares: int - number of shares owned
+        returns:
+            dict - holding value and metrics
+    '''
+    return {
+        'Shares Owned': shares,
+        'Average Price per Share': f'${round(average_price, 2)}',
+        'Total Purchase Value': f'${round(average_price * shares, 2)}',
+        'Current Price per Share': f'${round(current_price, 2)}',
+        'Market Value': f'${round(current_price * shares, 2)}',
+        'Change per Share': f'${round(current_price - average_price, 2)}',
+        'Total Change': f'${round((current_price - average_price) * shares, 2)}',
+        '% Change': f'{round(((current_price - average_price) / average_price) * 100, 2)}%'
+    }
+
+
+def delete_holdings(portfolio_id: int, ticker: str, shares_sold: int, ) -> None:
+    '''deletes a holding from a portfolio. if not all shares are sold, updates the holding
+        args:
+            portfolio_id: int - database id of the portfolio
+            ticker: str - stock ticker
+    '''
+    holding = Holdings.query.filter_by(portfolio_id=portfolio_id, ticker=ticker).first()
+
+    if holding.shares == shares_sold:
+        db.session.delete(holding)
+    else: 
+        holding.shares -= shares_sold
+
+    db.session.commit()

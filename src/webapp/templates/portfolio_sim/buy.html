@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}My Dashboard{% endblock %} 
+{% block title %}Buy Stocks{% endblock %} 
 
 {% block content%}
 <div class="container mt-5">
     <div class="p-5 bg-body-tertiary rounded-3 mt-3">
         <h1 class="text-center"><strong>{{ info.company_name }}</strong> <br><br></h1>
-        <h3 class="text-center">As of {{ time }}, the current price of <strong>{{ ticker }}</strong> is <strong>${{ info.price }} {{ info.currency }}</strong> <br><br></h3>
+        <h3 class="text-center">As of {{ time }}, the price of <strong>{{ ticker }}</strong> is <strong>${{ info.price }} {{ info.currency }}</strong> <br><br></h3>
         
         <div class="accordion mt-3" id="details">
             <div class="accordion-item">
