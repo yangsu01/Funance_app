@@ -160,7 +160,11 @@ def create_portfolio(user_id: int) -> None:
     db.session.add(portfolio)
     db.session.commit()
 
-    return portfolio
+    portfolio_id = Portfolio.query.filter_by(user_id=user_id).first().id
+    history = History(portfolio_id=portfolio_id, date=datetime.today().date(), portfolio_value=STARTING_FUNDS)
+
+    db.session.add(history)
+    db.session.commit()
 
 
 def get_stock_info(ticker: str) -> dict:
