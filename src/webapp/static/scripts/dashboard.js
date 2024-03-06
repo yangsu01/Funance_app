@@ -38,6 +38,15 @@ let openSellPopup = () => {
 
 
 /**
+ * Opens the search stock popup
+ */
+let openSearchPopup = () => {
+    let searchPopup = new bootstrap.Modal(document.getElementById('searchPopup'))
+    searchPopup.show()
+}
+
+
+/**
  * creates interactive plot of portfolio performance history
  * @param {JSON} data - portfolio history  
  */
@@ -61,23 +70,23 @@ let renderHistoryPlot = (data) => {
 
         xaxis: {
             autorange: true,
-        rangeselector: {buttons: [
-            {
-                count: 7,
-                label: '1w',
-                step: 'day',
-                stepmode: 'backward'
-            },
-            {
-                count: 1,
-                label: '1m',
-                step: 'month',
-                stepmode: 'backward'
-            },
-            {step: 'all'}
-        ]},
-        rangeslider: {range: [x[0], x[x.length - 1]]},
-        type: 'date'
+            rangeselector: {buttons: [
+                {
+                    count: 7,
+                    label: '1w',
+                    step: 'day',
+                    stepmode: 'backward'
+                },
+                {
+                    count: 1,
+                    label: '1m',
+                    step: 'month',
+                    stepmode: 'backward'
+                },
+                {step: 'all'}
+            ]},
+            rangeslider: {range: [x[0], x[x.length - 1]]},
+            type: 'date'
         },
 
         yaxis: {

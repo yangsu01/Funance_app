@@ -42,6 +42,17 @@ def dashboard():
                 return redirect(url_for('sim.sell_stock', ticker=ticker))
             else:
                 flash(f'Please select a stock to sell', category='error')
+        elif 'searchTicker' in request.form:
+            ticker = request.form['searchTicker'].upper()
+            try:
+                ticker_info = yf.Ticker(ticker).info
+                
+                if 'currentPrice' in ticker_info:
+                    return redirect(url_for('sim.search_stock', ticker=ticker))
+                else:
+                    flash(f'Cannot find ticker {ticker}', category='error')
+            except:
+                flash(f'Cannot find ticker {ticker}', category='error')
 
     portfolio_exists = current_user.portfolio
 
@@ -50,8 +61,6 @@ def dashboard():
         has_transactions = current_user.portfolio.transactions
         transactions, holdings = [], []
         history = get_portfolio_history(current_user.portfolio.id)
-
-        # save_portfolio_value()
 
         if has_holdings:
             holdings = get_portfolio_holdings(current_user.portfolio.id)
@@ -105,7 +114,17 @@ def buy_stock(ticker: str):
 
         return redirect(url_for('sim.dashboard'))
 
-    stock_info = get_stock_info(ticker)
+    info = get_stock_info(ticker)
+
+    stock_info = {
+        'price': info['price'],
+        'industry': info['industry'],
+        'company_summary': info['company_summary'],
+        'currency': info['currency'],
+        'company_name': info['company_name'],
+        'open': info['open']
+    }
+
     est_time = get_est_time()
     available_cash = get_available_cash(current_user.id)
     max_shares = int(available_cash / stock_info['price'])
@@ -149,6 +168,53 @@ def sell_stock(ticker: str):
                            time=get_est_time())
 
 
+@sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
+@login_required
+def search_stock(ticker: str):
+    if request.method == 'POST':
+        ticker = request.form['ticker'].upper()
+        og_ticker = request.form['originalTicker'].upper()
+        try:
+            ticker_info = yf.Ticker(ticker).info
+            
+            if 'currentPrice' in ticker_info:
+                return redirect(url_for('sim.search_stock', ticker=ticker))
+            else:
+                flash(f'Cannot find ticker {ticker}', category='error')
+                return redirect(url_for('sim.search_stock', ticker=og_ticker))
+
+        except:
+            flash(f'Cannot find ticker {ticker}', category='error')
+            return redirect(url_for('sim.search_stock', ticker=og_ticker))
+    
+    info = get_stock_info(ticker)
+    stock_info = {
+        'price': info['price'],
+        'industry': info['industry'],
+        'company_summary': info['company_summary'],
+        'currency': info['currency'],
+        'company_name': info['company_name'],
+    }
+    performance_info = {
+        'Current Price': f"${info['price']}",
+        'Open Price': f"${info['open']}",
+        'Day Change': f"${info['day_change']}",
+        '% Day Change': f"{info['%_day_change']}%",
+        '52 Week Returns': f"{info['52_week_returns']}%",
+        '52 Week High': f"${info['52_week_high']}",
+        '52 Week Low': f"${info['52_week_low']}"
+    }
+
+    history = get_stock_history(ticker)
+    return render_template("portfolio_sim/search.html", 
+                           user=current_user, 
+                           info=stock_info, 
+                           performance=performance_info,
+                           ticker=ticker, 
+                           time=get_est_time(),
+                           history=history)
+
+
 # functions
 def create_portfolio(user_id: int) -> None:
     '''Create a portfolio for a user
@@ -172,16 +238,19 @@ def get_stock_info(ticker: str) -> dict:
     '''
     stock_info = yf.Ticker(ticker).info
 
-    parced_info = {
-        'price': round(float(stock_info.get('currentPrice', 'n/a')), 2),
+    return {
+        'price': round(float(stock_info.get('currentPrice', 0)), 2),
         'industry': stock_info.get('industry', 'n/a'),
         'company_summary': stock_info.get('longBusinessSummary', 'n/a'),
         'currency': stock_info.get('currency', 'n/a'),
         'company_name': stock_info.get('longName', 'n/a'),
-        'open': stock_info.get('open', 'n/a')
+        'open': stock_info.get('open', 'n/a'),
+        'day_change': round(float(stock_info.get('currentPrice', 0))-float(stock_info.get('open', 1)), 2),
+        '%_day_change': round((float(stock_info.get('currentPrice', 0))/float(stock_info.get('open', 1)) - 1)*100, 2),
+        '52_week_returns': round(float(stock_info.get('52WeekChange', 0))*100, 2),
+        '52_week_high': round(float(stock_info.get('fiftyTwoWeekHigh', 0)), 2),
+        '52_week_low': round(float(stock_info.get('fiftyTwoWeekLow', 0)), 2)
     }
-
-    return parced_info
 
 
 def get_est_time() -> str:
@@ -481,3 +550,21 @@ def delete_holdings(portfolio_id: int, ticker: str, shares_sold: int, ) -> None:
         holding.shares -= shares_sold
 
     db.session.commit()
+
+
+def get_stock_history(ticker: str, period='5y') -> str:
+    '''Gets the historical price of a stock
+        args:
+            ticker: str - stock ticker
+            period: str - time period for the historical data
+        returns:
+            str - json string of the historical price of a stock
+    '''
+    stock = yf.Ticker(ticker).history(period=period)
+
+    history = {
+        'Date': [d.strftime('%Y-%m-%d') for d in stock.index],
+        'Price': [p for p in round(stock['Close'], 2)]
+    }
+
+    return json.dumps(history)
