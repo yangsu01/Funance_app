@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Sell Stocks{% endblock %} 
+{% block title %}Sell {{ticker}}{% endblock %} 
 
 {% block content%}
 <div class="container mt-5">
@@ -11,20 +11,20 @@
         <div class="container mt-3 w-50">
             <div class="accordion mb-5" id="details">
                 <div class="accordion-item">
-                  <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
-                      Holding Details
-                    </button>
-                  </h2>
-                  <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
-                    <div class="accordion-body">
-                        <ul class="list-group">
-                            {% for key, value in details.items() %}
-                                <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
-                            {% endfor %}
-                        </ul>
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
+                            Holding Details
+                        </button>
+                    </h2>
+                    <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
+                        <div class="accordion-body">
+                            <ul class="list-group">
+                                {% for key, value in details.items() %}
+                                    <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                  </div>
                 </div>
             </div>
             

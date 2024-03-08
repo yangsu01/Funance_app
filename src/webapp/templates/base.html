@@ -23,6 +23,7 @@
             <li><a href="/" class="nav-link px-2 text-white" id="home">Home</a></li>
             <li><a href="/rules" class="nav-link px-2 text-secondary" id="rules">Game Rules</a></li>
             {% if user.is_authenticated %}
+              <li><a href="/leaderboard" class="nav-link px-2 text-secondary" id="leaderboard">Leaderboard</a></li>
               <li><a href="/dashboard" class="nav-link px-2 text-secondary" id="dashboard">My Portfolio</a></li>
             {% endif %}
           </ul>
@@ -71,7 +72,7 @@
           <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
             <img src="../static/icons/funance_logo.jpg" alt="FUNance logo" width="24" height="24">
           </a>
-          <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2024 FUNance v1.0.0</span>
+          <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2024 FUNance v0.1.0</span>
         </div>
     
         <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">

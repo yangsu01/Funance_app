@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 from . import db
 from .data_models import User
@@ -64,7 +65,7 @@ def sign_up():
             flash('Password must at least 6 characters long.', category='error')
         else:
             # add new user to db
-            new_user = User(email=email, username=username, password=generate_password_hash(password1))
+            new_user = User(email=email, username=username, password=generate_password_hash(password1), creation_date=datetime.today().date())
             db.session.add(new_user)
             db.session.commit()
 
