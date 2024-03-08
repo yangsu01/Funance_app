@@ -33,24 +33,62 @@ def create_app():
     scheduler.init_app(app)
 
     # define jobs
-    def run_hourly():
-        from .portfolio_sim import update_prices, update_portfolio_value
+    def update_prices():
+        from .portfolio_sim import update_prices, update_portfolio_value, save_history
 
         with app.app_context():
             update_prices()
             update_portfolio_value()
+            save_history()
+
             print('Prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
 
-    def run_daily():
-        from .portfolio_sim import save_portfolio_value
+    def update_open():
+        from .portfolio_sim import update_opening_prices
 
         with app.app_context():
-            save_portfolio_value()
-            print('Portfolio value saved at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
+            update_opening_prices()
 
-    # add jobs
-    scheduler.add_job(id='Hourly task', func=run_hourly, trigger='interval', hours=1)
-    scheduler.add_job(id='Daily task', func=run_daily, trigger='cron', hour=17, minute=0)
+            print('Opening prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
+
+    def update_close():
+        from .portfolio_sim import update_last_close_value
+
+        with app.app_context():
+            update_last_close_value()
+
+            print('Closing prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
+    
+    # run every 30 minutes between 9am and 4pm
+    scheduler.add_job(id='update_prices',
+                      func=update_prices,
+                      trigger='cron',
+                      day_of_week='mon-fri', 
+                      hour='9-16', 
+                      minute='0, 30',
+                      second='10', # TODO maybe delete?
+                      timezone='EST')
+    
+    # run once at 9:30am
+    scheduler.add_job(id='update_open',
+                      func=update_open,
+                      trigger='cron', 
+                      day_of_week='mon-fri',
+                      hour='9', 
+                      minute='30',
+                      second='10', # TODO maybe delete?
+                      timezone='EST')
+    
+    # run once at 4:00pm
+    scheduler.add_job(id='update_close',
+                      func=update_close,
+                      trigger='cron', 
+                      day_of_week='mon-fri',
+                      hour='16', 
+                      minute='0',
+                      second='10', # TODO maybe delete?
+                      timezone='EST')
+
 
     scheduler.start()
     
