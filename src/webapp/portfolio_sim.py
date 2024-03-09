@@ -82,7 +82,8 @@ def dashboard():
                         available_cash=current_user.portfolio.available_cash,
                         transactions=transactions,
                         holdings=holdings,
-                        history=history
+                        history=history,
+                        cash_available=current_user.portfolio.available_cash,
                         )
 
     return render_template("portfolio_sim/dashboard.html", 
@@ -175,20 +176,24 @@ def sell_stock(ticker: str):
 @login_required
 def search_stock(ticker: str):
     if request.method == 'POST':
-        ticker = request.form['ticker'].upper()
-        og_ticker = request.form['originalTicker'].upper()
-        try:
-            ticker_info = yf.Ticker(ticker).info
-            
-            if 'currentPrice' in ticker_info:
-                return redirect(url_for('sim.search_stock', ticker=ticker))
-            else:
+        if 'searchTicker' in request.form:
+            ticker = request.form['ticker'].upper()
+            og_ticker = request.form['originalTicker'].upper()
+            try:
+                ticker_info = yf.Ticker(ticker).info
+                
+                if 'currentPrice' in ticker_info:
+                    return redirect(url_for('sim.search_stock', ticker=ticker))
+                else:
+                    flash(f'Cannot find ticker {ticker}', category='error')
+                    return redirect(url_for('sim.search_stock', ticker=og_ticker))
+
+            except:
                 flash(f'Cannot find ticker {ticker}', category='error')
                 return redirect(url_for('sim.search_stock', ticker=og_ticker))
-
-        except:
-            flash(f'Cannot find ticker {ticker}', category='error')
-            return redirect(url_for('sim.search_stock', ticker=og_ticker))
+        elif 'buyTicker' in request.form:
+            ticker = request.form['buyTicker']
+            return redirect(url_for('sim.buy_stock', ticker=ticker))
     
     info = get_stock_info(ticker)
     stock_info = {
@@ -209,13 +214,16 @@ def search_stock(ticker: str):
     }
 
     history = get_stock_history(ticker)
+    news = get_ticker_news(ticker)
+
     return render_template("portfolio_sim/search.html", 
                            user=current_user, 
                            info=stock_info, 
                            performance=performance_info,
                            ticker=ticker, 
                            time=get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z'),
-                           history=history)
+                           history=history,
+                           news=news)
 
 
 @sim.route('/leaderboard', methods=['GET'])
@@ -611,12 +619,18 @@ def get_top_performers() -> str:
     ranked_portfolios = sorted(portfolios, key=lambda p: p.updated_value, reverse=True)
 
     top_performers = []
-    rank = 0
+    count = 0
+    prev = None
 
     for portfolio in ranked_portfolios:
-        rank += 1
-        portfolio_change =  round((portfolio.updated_value/STARTING_FUNDS - 1) * 100, 2)
+        count += 1
+        updated_val = portfolio.updated_value
+        portfolio_change =  round((updated_val/STARTING_FUNDS - 1) * 100, 2)
         portfolio_age = (get_est_time().date() - portfolio.creation_date).days
+
+        rank = count
+        if updated_val == prev:
+            rank = '-'
         
         if portfolio_age == 0:
             daily_change = 'n/a'
@@ -632,6 +646,8 @@ def get_top_performers() -> str:
             'Average Daily Change (%)': daily_change
         })
 
+        prev = updated_val
+
 
     return json.dumps(top_performers)
 
@@ -645,19 +661,28 @@ def get_top_daily_performers() -> str:
     ranked_portfolios = sorted(portfolios, key=lambda p: (p.updated_value / p.last_close_value), reverse=True)
 
     top_performers = []
-    rank = 0
+    count = 0
+    prev = None
 
     for portfolio in ranked_portfolios:
-        rank += 1
+        count += 1
         day_change =  round(portfolio.updated_value - portfolio.last_close_value, 2)
+        day_change_percent = round(day_change/portfolio.last_close_value, 2)
+
+        rank = count
+        if day_change_percent == prev:
+            rank = '-'
 
         top_performers.append({
             'Rank': rank,
             'Username': portfolio.user.username,
-            'Change (%)': round(day_change/portfolio.last_close_value, 2),
+            'Change (%)': day_change_percent,
             'Change ($)': day_change,
             'Total Portfolio Value': portfolio.updated_value
         })
+
+        prev = day_change_percent
+
 
 
     return json.dumps(top_performers)
@@ -687,3 +712,22 @@ def get_update_time() -> str:
             str - last update time
     '''
     return Portfolio.query.first().updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z')
+
+
+def get_ticker_news(ticker: str) -> list:
+    '''Gets the related news articles for a stock
+        args:
+            ticker: str - stock ticker
+        returns:
+            list - news articles for the stock
+    '''
+    news = yf.Ticker(ticker).news
+    articles = []
+
+    for n in news:
+        articles.append({
+            'name': n['title'],
+            'url': n['link']
+        })
+
+    return articles

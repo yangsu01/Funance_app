@@ -9,9 +9,14 @@
         data-history="{{ history }}">
     </div>
 
+<!-- Header buttons -->
 <div class="container p-5 bg-body-tertiary rounded-3 my-5">
     <div class="d-flex justify-content-between mb-5">
-        <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
+        <form method="POST">
+            <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
+            <input type="hidden" name="buyTicker" value="{{ ticker }}">
+            <button type="submit" class="btn btn-success">Buy {{ ticker }}</button>
+        </form>
 
         <form method="POST">
             <div class="input-group">
@@ -27,27 +32,10 @@
     <h1 class="text-center"><strong>{{ info.company_name }}</strong> <br></h1>
     <h3 class="text-center">As of {{ time }}, the price of <strong>{{ ticker }}</strong> is <strong>${{ info.price }} {{ info.currency }}</strong> <br></h3>
 
-    <!-- company summary -->
-    <div class="accordion mt-5" id="summary">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryDetails" aria-expanded="true" aria-controls="summary">
-                    Company Summary
-                </button>
-            </h2>
-            <div id="summaryDetails" class="accordion-collapse collapse" data-bs-parent="#summary">
-                <div class="accordion-body">
-                    <h6><strong>Industry:</strong> {{ info.industry }}</h6><br>
-                    <h6><strong>Summary:</strong></h6>
-                    <p>{{ info.company_summary }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- History plot -->
     <div class="my-3 w-100" id="historyPlot" style="display: block; box-sizing: border-box; height: 500px;"></div>
 
+    <!-- Performance Summary -->
     <div class="table-responsive">
         <table class="table table-striped table-dark" id="performanceTable">
             <h4 class="mt-5">Performance Summary</h4>
@@ -62,6 +50,31 @@
                 {% endfor %}
             </tr>
         </table>
+    </div>
+
+    <!-- company summary -->
+    <div class="accordion mt-3" id="summary">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryDetails" aria-expanded="true" aria-controls="summary">
+                    Company Summary
+                </button>
+            </h2>
+            <div id="summaryDetails" class="accordion-collapse collapse" data-bs-parent="#summary">
+                <div class="accordion-body">
+                    <h6><strong>Industry:</strong> {{ info.industry }}</h6><br>
+                    <h6><strong>Summary:</strong></h6>
+                    <p>{{ info.company_summary }}</p>
+
+                    <h6><strong>Related News:</strong></h6>
+                    <ul class="list-group">
+                        {% for article in news %}
+                            <li class="list-group-item"> <a href="{{article.url}}">{{article.name}}</a> </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
     
 </div>

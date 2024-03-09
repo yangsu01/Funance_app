@@ -29,10 +29,20 @@ let renderHistoryPlot = (data, ticker) => {
 
     let layout = {
         title: `Price History of ${ticker}`,
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+
+        font: {
+            size: 16,
+            color: '#FFFFFF'
+          },
 
         xaxis: {
             autorange: true,
-            rangeselector: {buttons: [
+            rangeselector: {
+                bgcolor: 'black',
+
+                buttons: [
                 {
                     count: 1,
                     label: '1m',
@@ -67,7 +77,8 @@ let renderHistoryPlot = (data, ticker) => {
 
         yaxis: {
             autorange: true,
-            type: 'linear'
+            type: 'linear',
+            showgrid: false
         }
     }
 
