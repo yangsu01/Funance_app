@@ -75,7 +75,7 @@ def dashboard():
                         user=current_user, 
                         username=current_user.username, 
                         portfolio_exists=portfolio_exists, 
-                        update_time=current_user.portfolio.updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z'),
+                        update_time=current_user.portfolio.updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z') + ' EST',
                         portfolio_value=current_user.portfolio.updated_value,
                         has_holdings=has_holdings, 
                         has_transactions=has_transactions, 
@@ -128,7 +128,7 @@ def buy_stock(ticker: str):
         'open': info['open']
     }
 
-    est_time = get_est_time()
+    est_time = get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z')
     available_cash = get_available_cash(current_user.id)
     max_shares = int(available_cash / stock_info['price'])
 
@@ -168,7 +168,7 @@ def sell_stock(ticker: str):
                            info=info,
                            details=details, 
                            current_price=current_price,
-                           time=get_est_time())
+                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z'))
 
 
 @sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
@@ -214,13 +214,23 @@ def search_stock(ticker: str):
                            info=stock_info, 
                            performance=performance_info,
                            ticker=ticker, 
-                           time=get_est_time(),
+                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z'),
                            history=history)
 
 
 @sim.route('/leaderboard', methods=['GET'])
 def leaderboard():
-    return render_template("portfolio_sim/leaderboard.html", user=current_user)
+    top_performers = get_top_performers()
+    top_daily_performers = get_top_daily_performers()
+    performance_history = get_performance_history()
+    update_time = get_update_time() + ' EST'
+
+    return render_template("portfolio_sim/leaderboard.html",
+                           user=current_user,
+                           top_performers=top_performers,
+                           top_daily_performers=top_daily_performers,
+                           performance_history=performance_history,
+                           update_time=update_time)
 
 
 # functions
@@ -582,7 +592,7 @@ def get_stock_history(ticker: str, period='5y') -> str:
         returns:
             str - json string of the historical price of a stock
     '''
-    stock = yf.Ticker(ticker).history(period=period)
+    stock = yf.Ticker(ticker).history(period=period).dropna()
 
     history = {
         'Date': [d.strftime('%Y-%m-%d') for d in stock.index],
@@ -590,3 +600,90 @@ def get_stock_history(ticker: str, period='5y') -> str:
     }
 
     return json.dumps(history)
+
+
+def get_top_performers() -> str:
+    '''Gets the top performing portfolios ordered
+        returns:
+            str - json string of top performing portfolios
+    '''
+    portfolios = Portfolio.query.all()
+    ranked_portfolios = sorted(portfolios, key=lambda p: p.updated_value, reverse=True)
+
+    top_performers = []
+    rank = 0
+
+    for portfolio in ranked_portfolios:
+        rank += 1
+        portfolio_change =  round((portfolio.updated_value/STARTING_FUNDS - 1) * 100, 2)
+        portfolio_age = (get_est_time().date() - portfolio.creation_date).days
+        
+        if portfolio_age == 0:
+            daily_change = 'n/a'
+        else:
+            daily_change = round(portfolio_change/portfolio_age, 2)
+        
+        top_performers.append({
+            'Rank': rank,
+            'Username': portfolio.user.username,
+            'Portfolio Value': portfolio.updated_value,
+            'Change (%)': portfolio_change,
+            'Portfolio Age (days)': portfolio_age,
+            'Average Daily Change (%)': daily_change
+        })
+
+
+    return json.dumps(top_performers)
+
+
+def get_top_daily_performers() -> str:
+    '''Gets the top daily performers ordered
+        returns:
+            str - json string of top daily performers
+    '''
+    portfolios = Portfolio.query.all()
+    ranked_portfolios = sorted(portfolios, key=lambda p: (p.updated_value / p.last_close_value), reverse=True)
+
+    top_performers = []
+    rank = 0
+
+    for portfolio in ranked_portfolios:
+        rank += 1
+        day_change =  round(portfolio.updated_value - portfolio.last_close_value, 2)
+
+        top_performers.append({
+            'Rank': rank,
+            'Username': portfolio.user.username,
+            'Change (%)': round(day_change/portfolio.last_close_value, 2),
+            'Change ($)': day_change,
+            'Total Portfolio Value': portfolio.updated_value
+        })
+
+
+    return json.dumps(top_performers)
+
+
+def get_performance_history() -> str:
+    '''Gets the performance history of all portfolios
+        returns:
+            str - json string of the performance history of all portfolios
+    '''
+    portfolios = Portfolio.query.all()
+    history = []
+
+    for portfolio in portfolios:
+        history.append({
+            'x': [h.record_time.strftime('%Y-%m-%d %H:%M') for h in portfolio.history],
+            'y': [h.portfolio_value for h in portfolio.history],
+            'name': portfolio.user.username
+        })
+
+    return json.dumps(history)
+
+
+def get_update_time() -> str:
+    '''Gets the last time the portfolios were updated
+        returns:
+            str - last update time
+    '''
+    return Portfolio.query.first().updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z')
