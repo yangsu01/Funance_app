@@ -79,12 +79,12 @@ def create_app():
                       second='10', # TODO maybe delete?
                       timezone='EST')
     
-    # run once at 4:00pm
+    # run once at 6:00am
     scheduler.add_job(id='update_close',
                       func=update_close,
                       trigger='cron', 
                       day_of_week='mon-fri',
-                      hour='16', 
+                      hour='6', 
                       minute='0',
                       second='10', # TODO maybe delete?
                       timezone='EST')
