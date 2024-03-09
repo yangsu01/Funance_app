@@ -41,23 +41,17 @@ def create_app():
             update_portfolio_value()
             save_history()
 
-            print('Prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
-
     def update_open():
         from .portfolio_sim import update_opening_prices
 
         with app.app_context():
             update_opening_prices()
 
-            print('Opening prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
-
     def update_close():
         from .portfolio_sim import update_last_close_value
 
         with app.app_context():
             update_last_close_value()
-
-            print('Closing prices updated at ', datetime.now().strftime('%H:%M:%S')) #TODO temp for testing
     
     # run every 30 minutes between 9am and 4pm
     scheduler.add_job(id='update_prices',
@@ -66,7 +60,7 @@ def create_app():
                       day_of_week='mon-fri', 
                       hour='9-16', 
                       minute='0, 30',
-                      second='10', # TODO maybe delete?
+                      second='10',
                       timezone='EST')
     
     # run once at 9:30am
@@ -76,7 +70,7 @@ def create_app():
                       day_of_week='mon-fri',
                       hour='9', 
                       minute='30',
-                      second='10', # TODO maybe delete?
+                      second='10',
                       timezone='EST')
     
     # run once at 6:00am
@@ -86,10 +80,10 @@ def create_app():
                       day_of_week='mon-fri',
                       hour='6', 
                       minute='0',
-                      second='10', # TODO maybe delete?
+                      second='10',
                       timezone='EST')
-
-
+    
+    print('Scheduler started')
     scheduler.start()
     
     # create db if not already created
