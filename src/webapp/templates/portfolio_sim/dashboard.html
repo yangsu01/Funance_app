@@ -113,7 +113,9 @@
             <!-- portfolio holdings -->
             <div class="container w-100">
                 <h3 class="mt-5">Portfolio Breakdown</h3>
-                <table class="table table-striped table-hover table-dark" id="holdingsTable"></table>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-dark" id="holdingsTable"></table>
+                </div>
             </div>
         {% endif %}
 
@@ -124,7 +126,9 @@
             <!-- transaction history -->
             <div class="container w-100">
                 <h3 class="mt-5">Transaction History</h3>
-                <table class="table table-striped table-hover table-dark" id="transactionsTable"></table>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-dark" id="transactionsTable"></table>
+                </div>
             </div>
         {% else %}
             <h1 class="text-center mt-5 mb-5">Buy something first to track your portfolio!</h1>

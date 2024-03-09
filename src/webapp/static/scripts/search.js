@@ -71,5 +71,9 @@ let renderHistoryPlot = (data, ticker) => {
         }
     }
 
-    Plotly.newPlot('historyPlot', [plotData], layout)
-}
+    Plotly.newPlot('historyPlot', [plotData], layout).then(() => {
+        window.onresize = function() {
+            Plotly.Plots.resize('historyPlot')
+          }
+    })
+}   

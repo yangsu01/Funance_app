@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable(transactionData, 'transactionsTable')
     }
 
-    renderHistoryPlot(historyData)
+    if (historyData['Date'].length > 1) {
+        renderHistoryPlot(historyData)
+    }
 })
 
 
@@ -62,7 +64,8 @@ let renderHistoryPlot = (data) => {
         type: 'scatter',
         mode: 'lines',
         marker: {color: 'blue'},
-        name: 'Portfolio Value'
+        name: 'Portfolio Value',
+        line: {color: '#17BECF'}
     }
 
     let layout = {
@@ -86,16 +89,21 @@ let renderHistoryPlot = (data) => {
                 {step: 'all'}
             ]},
             rangeslider: {range: [x[0], x[x.length - 1]]},
-            type: 'date'
+            title:  'Time'
         },
 
         yaxis: {
             autorange: true,
-            type: 'linear'
+            type: 'linear',
+            title: 'Portfolio Value ($)'
         }
     }
 
-    Plotly.newPlot('historyPlot', [plotData], layout)
+    Plotly.newPlot('historyPlot', [plotData], layout).then(() => {
+        window.onresize = function() {
+            Plotly.Plots.resize('historyPlot')
+          }
+    })
 }
 
 
