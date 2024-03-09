@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <link href="//cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css" rel="stylesheet">
+{% endblock %}
+
 {% block title %}My Dashboard{% endblock %} 
 
 {% block content%}
@@ -15,7 +19,7 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h1">{{ username }}'s Portfolio</h1>
             <div class="btn-toolbar mb-2 mb-md-0 button-container">
-                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openBuyPopup()">Buy Stocks</button>
+                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openPopup('buyPopup')">Buy Stocks</button>
                 <!-- buy popup -->
                 <div class="modal" id="buyPopup">
                     <div class="modal-dialog">
@@ -41,7 +45,7 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openSellPopup()">Sell Shares</button>
+                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openPopup('sellPopup')">Sell Shares</button>
                 <!-- sell popup -->
                 <div class="modal" id="sellPopup">
                     <div class="modal-dialog">
@@ -70,7 +74,7 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openSearchPopup()">Ticker Lookup</button>
+                <button type="button" class="btn btn-lg btn-outline-secondary" onclick="openPopup('searchPopup')">Ticker Lookup</button>
                 <!-- ticker search popup -->
                 <div class="modal" id="searchPopup">
                     <div class="modal-dialog">
@@ -100,7 +104,7 @@
 
         <!-- portfolio value -->
         <div class="mt-4 mb-3 container">
-            <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong></h2>
+            <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong> (${{cash_available}} in cash)</h2>
             <h6 class="text-center" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every 30 minutes when the market is open"> 
                 <u>As of <strong>{{ update_time }}</strong></u>
             </h6>
@@ -108,7 +112,7 @@
         
         {% if has_holdings %}
             <!-- portfolio plot  -->
-            <div class="my-4 w-100" id="historyPlot" style="display: block; box-sizing: border-box; height: 500px;"></div>
+            <div class="my-4 w-100" id="historyPlot" style="display: block; box-sizing: border-box; height: 400px;"></div>
             
             <!-- portfolio holdings -->
             <div class="container w-100">
@@ -143,7 +147,7 @@
                     <a type="button" class="btn btn-outline-secondary btn-lg px-4 mr-3" id="rules" href="/rules">Game Rules</a>
                     <form method="POST">
                         <input type="hidden" name="create_portfolio" value="create user portfolio">
-                        <button type="submit" class="btn btn-primary btn-lg px-4 gap-3" id="createProfile">Create Profile</button>
+                        <button type="submit" class="btn btn-info btn-lg px-4 gap-3" id="createProfile">Create Profile</button>
                     </form>
                 </div>
             </div>
@@ -152,5 +156,6 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="//cdn.datatables.net/2.0.2/js/dataTables.min.js" defer></script>
     <script src="../../static/scripts/dashboard.js" defer></script>
 {% endblock %}

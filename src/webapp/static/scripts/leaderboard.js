@@ -51,10 +51,19 @@ let renderHistoryPlot = (data) => {
 
     let layout = {
         title: 'User Portfolio Values',
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+
+        font: {
+            size: 16,
+            color: '#FFFFFF'
+          },
 
         xaxis: {
             autorange: true,
-            rangeselector: {buttons: [
+            rangeselector: {
+                bgcolor: 'black',
+                buttons: [
                 {
                     count: 7,
                     label: '1w',
@@ -75,7 +84,8 @@ let renderHistoryPlot = (data) => {
         yaxis: {
             autorange: true,
             type: 'linear',
-            title: 'Portfolio Value ($)'
+            title: 'Portfolio Value ($)',
+            showgrid: false
         }
     }
 

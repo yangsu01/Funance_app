@@ -17,34 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (historyData['Date'].length > 1) {
         renderHistoryPlot(historyData)
+    } else {
+        document.getElementById('historyPlot').innerHTML = '<h3 class="text-center my-5">No history available yet!</h3>'
     }
 })
 
 
 /**
- * Opens the buying stock popup
+ * Opens popup
  */
-let openBuyPopup = () => {
-    let buyPopup = new bootstrap.Modal(document.getElementById('buyPopup'))
-    buyPopup.show()
-}
-
-
-/**
- * Opens the selling stock popup
- */
-let openSellPopup = () => {
-    let sellPopup = new bootstrap.Modal(document.getElementById('sellPopup'))
-    sellPopup.show()
-}
-
-
-/**
- * Opens the search stock popup
- */
-let openSearchPopup = () => {
-    let searchPopup = new bootstrap.Modal(document.getElementById('searchPopup'))
-    searchPopup.show()
+let openPopup = (popupId) => {
+    let popup = new bootstrap.Modal(document.getElementById(popupId))
+    popup.show()
 }
 
 
@@ -70,10 +54,19 @@ let renderHistoryPlot = (data) => {
 
     let layout = {
         title: 'Portfolio Value Over Time',
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+
+        font: {
+            size: 16,
+            color: '#FFFFFF'
+          },
 
         xaxis: {
             autorange: true,
-            rangeselector: {buttons: [
+            rangeselector: {
+                bgcolor: 'black',
+                buttons: [
                 {
                     count: 7,
                     label: '1w',
@@ -89,13 +82,14 @@ let renderHistoryPlot = (data) => {
                 {step: 'all'}
             ]},
             rangeslider: {range: [x[0], x[x.length - 1]]},
-            title:  'Time'
+            title: 'Time'
         },
 
         yaxis: {
             autorange: true,
             type: 'linear',
-            title: 'Portfolio Value ($)'
+            title: 'Portfolio Value ($)',
+            showgrid: false
         }
     }
 
@@ -135,6 +129,8 @@ let renderTable = (data, tableId) => {
         tbody.append(tr)
     })
     table.append(tbody)
+
+    $(`#${tableId}`). DataTable({searching: false})
 }
 
 
