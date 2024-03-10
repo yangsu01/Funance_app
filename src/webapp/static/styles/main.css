@@ -40,3 +40,12 @@ body {
 .button-container a {
     min-width: 100px;
 }
+
+.content-container {
+    max-width: 1000px;
+    padding: 1rem;
+}
+
+.holding-details{
+    max-width: 500px;
+}

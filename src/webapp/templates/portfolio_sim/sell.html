@@ -3,73 +3,73 @@
 {% block title %}Sell {{ticker}}{% endblock %} 
 
 {% block content%}
-<div class="container mt-5">
-    <div class="p-5 bg-body-tertiary rounded-3 mt-3 mb-3">
-        <h1 class="text-center">SELL: <strong>{{ info.name }}</strong> <br><br></h1>
-        <h3 class="text-center">As of {{ time }}, the price of <strong>{{ info.ticker }}</strong> is <strong>${{ current_price }} {{ info.currency }}</strong> <br><br></h3>
+<div class="container my-5 content-container">
+    <h1 class="text-center">SELL: <strong>{{ info.name }}</strong> <br><br></h1>
+    <h3 class="text-center"><strong>{{ info.ticker }}</strong> is currently <strong>${{ current_price }} {{ info.currency }}</strong></h3>
+    <h6 class="text-center"> 
+        <u>Updated: <strong>{{ time }}</strong></u>
+    </h6>
 
-        <div class="container mt-3 w-50">
-            <div class="accordion mb-5" id="details">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
-                            Holding Details
-                        </button>
-                    </h2>
-                    <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
-                        <div class="accordion-body">
-                            <ul class="list-group">
-                                {% for key, value in details.items() %}
-                                    <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
-                                {% endfor %}
-                            </ul>
+    <div class="container mt-5 holding-details">
+        <div class="accordion mb-5" id="details">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
+                        Holding Details
+                    </button>
+                </h2>
+                <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
+                    <div class="accordion-body">
+                        <ul class="list-group">
+                            {% for key, value in details.items() %}
+                                <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="lead text-center">
+            You own <strong>{{ info.shares }}</strong> shares, how many would you like to sell?
+        </p>
+    </div>
+
+    <div class="container" id="sellForm" data-max-shares="{{ info.shares }}">
+        <form method="POST" class="form-mini mx-auto">
+            <div class="form-floating mb-4">
+                <input type="number" class="form-control" id="shares" name="shares" required>
+                <label for="shares">Number of Shares</label>
+
+                <input type="hidden" name="ticker" id="ticker" value="{{ info.ticker }}">
+                <input type="hidden" name="price" id="price" value="{{ current_price }}">
+                <input type="hidden" name="currency" id="currency" value="{{ info.currency }}">
+                <input type="hidden" name="name" id="name" value="{{ info.name }}">
+            </div>
+            <div class="d-flex justify-content-between button-container" role="group" aria-label="Sell Options">
+                <a href="/dashboard" type="button" class="btn btn-secondary">Cancel</a>
+                <button type="button" class="btn btn-success" onclick="validateSell()">Sell</button> 
+            </div>
+
+            <!-- confirmation pop up -->
+            <div class="modal" id="confirmPopup">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center mt-5">
+                            <h4 id="confirmText">Are you sure?</h4>
+                            <div class="d-flex justify-content-end button-container mt-5" role="group" aria-label="Sell Options">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success">Sell!</button> 
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <p class="lead text-center">
-                You own <strong>{{ info.shares }}</strong> shares, how many would you like to sell?
-            </p>
-        </div>
 
-        <div class="container" id="sellForm" data-max-shares="{{ info.shares }}">
-            <form method="POST" class="form-mini mx-auto">
-                <div class="form-floating mb-4">
-                    <input type="number" class="form-control" id="shares" name="shares" required>
-                    <label for="shares">Number of Shares</label>
-
-                    <input type="hidden" name="ticker" id="ticker" value="{{ info.ticker }}">
-                    <input type="hidden" name="price" id="price" value="{{ current_price }}">
-                    <input type="hidden" name="currency" id="currency" value="{{ info.currency }}">
-                    <input type="hidden" name="name" id="name" value="{{ info.name }}">
-                </div>
-                <div class="d-flex justify-content-between button-container" role="group" aria-label="Sell Options">
-                    <a href="/dashboard" type="button" class="btn btn-secondary">Cancel</a>
-                    <button type="button" class="btn btn-success" onclick="validateSell()">Sell</button> 
-                </div>
-
-                <!-- confirmation pop up -->
-                <div class="modal" id="confirmPopup">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body text-center mt-5">
-                                <h4 id="confirmText">Are you sure?</h4>
-                                <div class="d-flex justify-content-end button-container mt-5" role="group" aria-label="Sell Options">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-success">Sell!</button> 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </form>
-        </div>
-
+        </form>
     </div>
 </div>
 {% endblock %}

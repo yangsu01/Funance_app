@@ -10,7 +10,7 @@
     </div>
 
 <!-- Header buttons -->
-<div class="container p-5 bg-body-tertiary rounded-3 my-5">
+<div class="container my-5 content-container">
     <div class="d-flex justify-content-between mb-5">
         <form method="POST">
             <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
@@ -21,7 +21,7 @@
         <form method="POST">
             <div class="input-group">
                 <input type="hidden" name="originalTicker" value="{{ ticker }}">
-                <input type="text" class="form-control" placeholder="Search Ticker" aria-label="Search Ticker" id="ticker" name="ticker" required>
+                <input type="text" class="form-control" placeholder="Ticker" aria-label="Search Ticker" id="ticker" name="ticker" required>
                 <div class="input-group-append">
                   <button class="btn btn-outline-secondary" type="submit">Search</button>
                 </div>
