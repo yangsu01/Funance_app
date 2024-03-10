@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
+import os
 
 db = SQLAlchemy()
 DB_NAME = "data.db"
@@ -15,7 +16,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = 'spooky secret'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD', f'sqlite:///{DB_NAME}')
+
+    # Disable tracking modifications to avoid a warning
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
     db.init_app(app)
 
     # register blueprints 
@@ -82,7 +88,6 @@ def create_app():
                       second='10',
                       timezone='EST')
     
-    print('Scheduler started')
     scheduler.start()
     
     # create db if not already created
