@@ -228,17 +228,21 @@ def search_stock(ticker: str):
 
 @sim.route('/leaderboard', methods=['GET'])
 def leaderboard():
-    top_performers = get_top_performers()
-    top_daily_performers = get_top_daily_performers()
-    performance_history = get_performance_history()
-    update_time = get_update_time() + ' EST'
+    try:
+        top_performers = get_top_performers()
+        top_daily_performers = get_top_daily_performers()
+        performance_history = get_performance_history()
+        update_time = get_update_time() + ' EST'
 
-    return render_template("portfolio_sim/leaderboard.html",
-                           user=current_user,
-                           top_performers=top_performers,
-                           top_daily_performers=top_daily_performers,
-                           performance_history=performance_history,
-                           update_time=update_time)
+        return render_template("portfolio_sim/leaderboard.html",
+                            user=current_user,
+                            top_performers=top_performers,
+                            top_daily_performers=top_daily_performers,
+                            performance_history=performance_history,
+                            update_time=update_time)
+    except:
+        flash(f'There is no leaderboard yet', category='error')
+        return redirect(url_for('views.home'))
 
 
 # functions
@@ -267,6 +271,9 @@ def create_portfolio(user_id: int) -> None:
     db.session.add(portfolio)
     db.session.commit()
 
+    history = History(portfolio_id=portfolio.id, record_time=get_est_time(), portfolio_value=STARTING_FUNDS)
+    db.session.add(history)
+    db.session.commit()
 
 def get_stock_info(ticker: str) -> dict:
     '''Gets custom stock information from yfinance

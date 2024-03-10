@@ -8,8 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderTable(topPerformersData, 'topPerformersTable')
     renderTable(dailyPerformersData, 'dailyPerformersTable')
-    renderHistoryPlot(historyData)
-    
+
+    if (historyData[0]['x'].length > 1) {
+        renderHistoryPlot(historyData)       
+    } else {
+        document.getElementById('historyPlot').innerHTML = '<h3 class="text-center my-5">No history available yet!</h3>'
+    }
 })
 
 
@@ -47,8 +51,6 @@ let renderTable = (data, tableId) => {
  * @param {JSON} data - portfolio history  
  */
 let renderHistoryPlot = (data) => {
-    historyPlot = document.getElementById('historyPlot')
-
     let layout = {
         title: 'User Portfolio Values',
         plot_bgcolor: 'rgba(0, 0, 0, 0)',

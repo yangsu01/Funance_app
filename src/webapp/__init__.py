@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
-from datetime import datetime #TODO delete later??
 
 db = SQLAlchemy()
 DB_NAME = "data.db"
