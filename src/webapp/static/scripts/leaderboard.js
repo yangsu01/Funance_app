@@ -59,34 +59,57 @@ let renderHistoryPlot = (data) => {
         font: {
             size: 16,
             color: '#FFFFFF'
-          },
+        },
+
+        margin: {
+            l: 40,
+            r: 40,
+            b: 50,
+            t: 100,
+            pad: 0
+        },
+
+        showlegend: true,
+
+        legend: {
+            x: 0,
+            y: 1,
+            traceorder: 'normal',
+            font: {
+              family: 'sans-serif',
+              size: 10,
+              color: '#FFFFFF'
+            },
+            bgcolor: '#000',
+            borderwidth: 1
+        },
 
         xaxis: {
             autorange: true,
             rangeselector: {
                 bgcolor: 'black',
                 buttons: [
-                {
-                    count: 7,
-                    label: '1w',
-                    step: 'day',
-                    stepmode: 'backward'
-                },
-                {
-                    count: 1,
-                    label: '1m',
-                    step: 'month',
-                    stepmode: 'backward'
-                },
-                {step: 'all'}
-            ]},
-            title:  'Time'
+                    {
+                        count: 7,
+                        label: '1w',
+                        step: 'day',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 1,
+                        label: '1m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {step: 'all'}
+                ]
+            },
         },
 
         yaxis: {
             autorange: true,
             type: 'linear',
-            title: 'Portfolio Value ($)',
+            tickangle: -45,
             showgrid: false
         }
     }

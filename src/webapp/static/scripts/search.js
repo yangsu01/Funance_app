@@ -35,7 +35,15 @@ let renderHistoryPlot = (data, ticker) => {
         font: {
             size: 16,
             color: '#FFFFFF'
-          },
+        },
+
+        margin: {
+            l: 40,
+            r: 40,
+            b: 50,
+            t: 100,
+            pad: 0
+        },
 
         xaxis: {
             autorange: true,
@@ -78,6 +86,7 @@ let renderHistoryPlot = (data, ticker) => {
         yaxis: {
             autorange: true,
             type: 'linear',
+            tickangle: -45,
             showgrid: false
         }
     }

@@ -60,35 +60,43 @@ let renderHistoryPlot = (data) => {
         font: {
             size: 16,
             color: '#FFFFFF'
-          },
+        },
+
+        margin: {
+            l: 40,
+            r: 40,
+            b: 50,
+            t: 100,
+            pad: 0
+        },
 
         xaxis: {
             autorange: true,
             rangeselector: {
                 bgcolor: 'black',
                 buttons: [
-                {
-                    count: 7,
-                    label: '1w',
-                    step: 'day',
-                    stepmode: 'backward'
-                },
-                {
-                    count: 1,
-                    label: '1m',
-                    step: 'month',
-                    stepmode: 'backward'
-                },
-                {step: 'all'}
-            ]},
+                    {
+                        count: 7,
+                        label: '1w',
+                        step: 'day',
+                        stepmode: 'backward'
+                    },
+                    {
+                        count: 1,
+                        label: '1m',
+                        step: 'month',
+                        stepmode: 'backward'
+                    },
+                    {step: 'all'}
+                ]
+            },
             rangeslider: {range: [x[0], x[x.length - 1]]},
-            title: 'Time'
         },
 
         yaxis: {
             autorange: true,
             type: 'linear',
-            title: 'Portfolio Value ($)',
+            tickangle: -45,
             showgrid: false
         }
     }

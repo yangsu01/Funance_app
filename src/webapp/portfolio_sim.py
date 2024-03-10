@@ -75,7 +75,7 @@ def dashboard():
                         user=current_user, 
                         username=current_user.username, 
                         portfolio_exists=portfolio_exists, 
-                        update_time=current_user.portfolio.updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z') + ' EST',
+                        update_time=current_user.portfolio.updated_time.strftime('%a, %b %d. %Y %I:%M%p') + ' EST',
                         portfolio_value=current_user.portfolio.updated_value,
                         has_holdings=has_holdings, 
                         has_transactions=has_transactions, 
@@ -129,7 +129,7 @@ def buy_stock(ticker: str):
         'open': info['open']
     }
 
-    est_time = get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z')
+    est_time = get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST'
     available_cash = get_available_cash(current_user.id)
     max_shares = int(available_cash / stock_info['price'])
 
@@ -169,7 +169,7 @@ def sell_stock(ticker: str):
                            info=info,
                            details=details, 
                            current_price=current_price,
-                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z'))
+                           time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST')
 
 
 @sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
@@ -207,7 +207,7 @@ def search_stock(ticker: str):
         'Current Price': f"${info['price']}",
         'Open Price': f"${info['open']}",
         'Day Change': f"${info['day_change']}",
-        '% Day Change': f"{info['%_day_change']}%",
+        'Day Change (%)': f"{info['%_day_change']}%",
         '52 Week Returns': f"{info['52_week_returns']}%",
         '52 Week High': f"${info['52_week_high']}",
         '52 Week Low': f"${info['52_week_low']}"
@@ -221,7 +221,7 @@ def search_stock(ticker: str):
                            info=stock_info, 
                            performance=performance_info,
                            ticker=ticker, 
-                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M %p %Z'),
+                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M%p') + ' EST',
                            history=history,
                            news=news)
 
@@ -232,7 +232,7 @@ def leaderboard():
         top_performers = get_top_performers()
         top_daily_performers = get_top_daily_performers()
         performance_history = get_performance_history()
-        update_time = get_update_time() + ' EST'
+        update_time = get_update_time()
 
         return render_template("portfolio_sim/leaderboard.html",
                             user=current_user,
@@ -432,14 +432,14 @@ def get_portfolio_holdings(portfolio_id: int) -> str:
 
     df['Day Change'] = round((df['updated_price'] - df['opening_price']), 2)
     df['Total Day Change'] = round((df['Day Change'] * df['number_of_shares']), 2)
-    df['% Day Change'] = round((df['Day Change'] / df['opening_price']) * 100, 2)
+    df['Day Change (%)'] = round((df['Day Change'] / df['opening_price']) * 100, 2)
     df['Change'] = round((df['updated_price'] - df['average_price']), 2)
     df['Total Change'] = round((df['Change'] * df['number_of_shares']), 2)
-    df['% Change'] = round((df['Change'] / df['average_price']) * 100, 2)
+    df['Change (%)'] = round((df['Change'] / df['average_price']) * 100, 2)
     df['Market Value'] = round((df['updated_price'] * df['number_of_shares']), 2)
 
     # rearrange and rename columns
-    df = df[['ticker', 'number_of_shares', 'average_price', 'updated_price', 'Day Change', '% Day Change', 'Total Change', '% Change', 'Market Value', 'currency']]
+    df = df[['ticker', 'number_of_shares', 'average_price', 'updated_price', 'Day Change', 'Day Change (%)', 'Total Change', 'Change (%)', 'Market Value', 'currency']]
     df = df.rename(columns={'ticker': 'Ticker',
                             'number_of_shares': 'Shares Owned',
                             'average_price': 'Average Price',
@@ -592,10 +592,10 @@ def calculate_holding_value(average_price: float, current_price: float, shares: 
         'Current Market Value': f'${round(current_price * shares, 2)}',
         'Day Change per Share': f'${round(current_price - open, 2)}',
         'Total Day Change': f'${round((current_price - open) * shares, 2)}',
-        '% Day Change': f'{round(((current_price - open) / open) * 100, 2)}%',
+        'Day Change (%)': f'{round(((current_price - open) / open) * 100, 2)}%',
         'Change per Share': f'${round(current_price - average_price, 2)}',
         'Total Change': f'${round((current_price - average_price) * shares, 2)}',
-        '% Change': f'{round(((current_price - average_price) / average_price) * 100, 2)}%'
+        'Change (%)': f'{round(((current_price - average_price) / average_price) * 100, 2)}%'
     }
 
 
@@ -650,7 +650,7 @@ def get_top_performers() -> str:
             'Portfolio Value': portfolio.updated_value,
             'Change (%)': portfolio_change,
             'Portfolio Age (days)': portfolio_age,
-            'Average Daily Change (%)': daily_change
+            'Daily Change (%)': daily_change
         })
 
         prev = updated_val
@@ -685,7 +685,7 @@ def get_top_daily_performers() -> str:
             'Username': portfolio.user.username,
             'Change (%)': day_change_percent,
             'Change ($)': day_change,
-            'Total Portfolio Value': portfolio.updated_value
+            'Total Value': portfolio.updated_value
         })
 
         prev = day_change_percent
@@ -718,7 +718,7 @@ def get_update_time() -> str:
         returns:
             str - last update time
     '''
-    return Portfolio.query.first().updated_time.strftime('%A, %B %d. %Y %I:%M %p %Z')
+    return Portfolio.query.first().updated_time.strftime('%a, %b %d. %Y %I:%M%p') + ' EST'
 
 
 def get_ticker_news(ticker: str) -> list:
