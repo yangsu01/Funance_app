@@ -30,7 +30,10 @@
     </div>
 
     <h1 class="text-center"><strong>{{ info.company_name }}</strong> <br></h1>
-    <h3 class="text-center">As of {{ time }}, the price of <strong>{{ ticker }}</strong> is <strong>${{ info.price }} {{ info.currency }}</strong> <br></h3>
+    <h3 class="text-center"><strong>{{ ticker }}</strong> is currently <strong>${{ info.price }} {{ info.currency }}</strong></h3>
+    <h6 class="text-center"> 
+        <u>Updated: <strong>{{ time }}</strong></u>
+    </h6>
 
     <!-- History plot -->
     <div class="my-3 w-100" id="historyPlot" style="display: block; box-sizing: border-box; height: 500px;"></div>
