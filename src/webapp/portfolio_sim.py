@@ -177,7 +177,7 @@ def sell_stock(ticker: str):
 def search_stock(ticker: str):
     if request.method == 'POST':
         if 'searchTicker' in request.form:
-            ticker = request.form['ticker'].upper()
+            ticker = request.form['searchTicker'].upper()
             og_ticker = request.form['originalTicker'].upper()
             try:
                 ticker_info = yf.Ticker(ticker).info
