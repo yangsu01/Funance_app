@@ -108,9 +108,9 @@ def buy_stock(ticker: str):
         name = request.form['name']
         price = float(request.form['price'])
         currency = request.form['currency']
-        open = float(request.form['open'])
+        industry = request.form['industry']
         
-        update_holding(current_user.portfolio.id, ticker, name, shares, price, currency)
+        update_holding(current_user.portfolio.id, ticker, name, shares, price, currency, industry)
         record_transaction(current_user.portfolio.id, ticker, 'buy', name, shares, price, currency)
         update_portfolio_cash(current_user.portfolio.id, shares*price)
 
@@ -152,7 +152,7 @@ def sell_stock(ticker: str):
         price = float(request.form['price'])
         currency = request.form['currency']
 
-        update_holding(current_user.portfolio.id, ticker, name, -1*shares, price, currency) # 0 is a placeholder (not used for sell)
+        update_holding(current_user.portfolio.id, ticker, name, -1*shares, price, currency)
         record_transaction(current_user.portfolio.id, ticker, 'sell', name, shares, price, currency)
         update_portfolio_cash(current_user.portfolio.id, -1*shares*price)
 
@@ -336,7 +336,7 @@ def record_transaction(portfolio_id: int, ticker: str, status: str, name: str, s
     db.session.commit()
 
 
-def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str) -> None:
+def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str, industry="Unknown") -> None:
     '''Updates a stock holding in a portfolio after a transaction
         If its a sell transaction (shares<0), assumes that the holding exists
         args:
@@ -346,7 +346,7 @@ def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price
             shares: int - number of shares
             price: float - price per share
             currency: str - currency of the stock
-            open_price: float - opening price of the stock for the day
+            industry: str - industry of the company
     '''
     holding = Holdings.query.filter_by(portfolio_id=portfolio_id, ticker=ticker).first()
 
@@ -373,7 +373,8 @@ def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price
                                average_price=round(price, 2), 
                                updated_price=round(price, 2),
                                currency=currency, 
-                               opening_price=round(price, 2))
+                               opening_price=round(price, 2),
+                               industry=industry)
 
             db.session.add(holding)
     

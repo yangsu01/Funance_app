@@ -40,6 +40,7 @@ class Holdings(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
     company_name = db.Column(db.String(150), nullable=False)
     ticker = db.Column(db.String(10), nullable=False)
+    industry = db.Column(db.String(150), default='Unknown')
     number_of_shares = db.Column(db.Integer, nullable=False)
     average_price = db.Column(db.Float, nullable=False)
     updated_price = db.Column(db.Float, nullable=False)
