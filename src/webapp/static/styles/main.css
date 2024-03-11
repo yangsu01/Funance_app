@@ -34,11 +34,11 @@ body {
 }
 
 .button-container button {
-    min-width: 100px;
+    min-width: 80px;
 }
 
 .button-container a {
-    min-width: 100px;
+    min-width: 80px;
 }
 
 .content-container {

@@ -3,17 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let dataContainer = document.getElementById('data-container')
     let historyData = JSON.parse(dataContainer.getAttribute('data-history'))
     let ticker = dataContainer.getAttribute('data-ticker')
+    let plotDivId = 'historyPlot'
 
-    renderHistoryPlot(historyData, ticker)
+    renderHistoryPlot(historyData, ticker, plotDivId)
 })
 
 /**
  * creates interactive plot of stock price history
  * @param {JSON} data - portfolio history  
  */
-let renderHistoryPlot = (data, ticker) => {
-    historyPlot = document.getElementById('historyPlot')
-
+let renderHistoryPlot = (data, ticker, plotDivId) => {
     let x = data['Date']
     let y = data['Price']
 
@@ -85,15 +84,16 @@ let renderHistoryPlot = (data, ticker) => {
 
         yaxis: {
             autorange: true,
+            fixedrange: false,
             type: 'linear',
             tickangle: -45,
             showgrid: false
         }
     }
 
-    Plotly.newPlot('historyPlot', [plotData], layout).then(() => {
+    Plotly.newPlot(plotDivId, [plotData], layout).then(() => {
         window.onresize = function() {
-            Plotly.Plots.resize('historyPlot')
+            Plotly.Plots.resize(plotDivId)
           }
     })
 }   
