@@ -16,6 +16,7 @@
             </h2>
             <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
             <div class="accordion-body">
+                <h6><strong>Sector:</strong> {{ info.sector }}</h6><br>
                 <h6><strong>Industry:</strong> {{ info.industry }}</h6><br>
                 <h6><strong>Company Summary:</strong></h6>
                 <p>{{ info.company_summary}}</p>
@@ -49,6 +50,7 @@
                 <input type="hidden" name="name" id="name" value="{{ info.company_name }}">
                 <input type="hidden" name="open" id="open" value="{{ info.open }}">
                 <input type="hidden" name="industry" id="industry" value="{{ info.industry }}">
+                <input type="hidden" name="sector" id="sector" value="{{ info.sector }}">
             </div>
             <div class="d-flex justify-content-between button-container" role="group" aria-label="Buy Options">
                 <a href="/dashboard" type="button" class="btn btn-secondary">Cancel</a>

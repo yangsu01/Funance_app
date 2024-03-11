@@ -109,8 +109,9 @@ def buy_stock(ticker: str):
         price = float(request.form['price'])
         currency = request.form['currency']
         industry = request.form['industry']
+        sector = request.form['sector']
         
-        update_holding(current_user.portfolio.id, ticker, name, shares, price, currency, industry)
+        update_holding(current_user.portfolio.id, ticker, name, shares, price, currency, industry, sector)
         record_transaction(current_user.portfolio.id, ticker, 'buy', name, shares, price, currency)
         update_portfolio_cash(current_user.portfolio.id, shares*price)
 
@@ -122,6 +123,7 @@ def buy_stock(ticker: str):
 
     stock_info = {
         'price': info['price'],
+        'sector': info['sector'],
         'industry': info['industry'],
         'company_summary': info['company_summary'],
         'currency': info['currency'],
@@ -198,6 +200,7 @@ def search_stock(ticker: str):
     info = get_stock_info(ticker)
     stock_info = {
         'price': info['price'],
+        'sector': info['sector'],
         'industry': info['industry'],
         'company_summary': info['company_summary'],
         'currency': info['currency'],
@@ -286,6 +289,7 @@ def get_stock_info(ticker: str) -> dict:
 
     return {
         'price': round(float(stock_info.get('currentPrice', 0)), 2),
+        'sector': stock_info.get('sector', 'n/a'),
         'industry': stock_info.get('industry', 'n/a'),
         'company_summary': stock_info.get('longBusinessSummary', 'n/a'),
         'currency': stock_info.get('currency', 'n/a'),
@@ -336,7 +340,7 @@ def record_transaction(portfolio_id: int, ticker: str, status: str, name: str, s
     db.session.commit()
 
 
-def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str, industry="Unknown") -> None:
+def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price: float, currency: str, industry="Unknown", sector="Unknown") -> None:
     '''Updates a stock holding in a portfolio after a transaction
         If its a sell transaction (shares<0), assumes that the holding exists
         args:
@@ -374,7 +378,8 @@ def update_holding(portfolio_id: int, ticker: str, name: str, shares: int, price
                                updated_price=round(price, 2),
                                currency=currency, 
                                opening_price=round(price, 2),
-                               industry=industry)
+                               industry=industry,
+                               sector=sector)
 
             db.session.add(holding)
     
