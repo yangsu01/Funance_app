@@ -3,33 +3,18 @@
 {% block title %}Buy {{ticker}}{% endblock %} 
 
 {% block content%}
+<!-- data -->
+<div id="data-container"
+    data-history="{{ history }}">
+</div>
+
 <div class="container my-5 content-container">
     <h1 class="text-center">BUY: <strong>{{ info.company_name }}</strong></h1>
-
-    <!-- listing details -->
-    <div class="accordion my-3" id="details">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
-                Listing Details
-            </button>
-            </h2>
-            <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
-            <div class="accordion-body">
-                <h6><strong>Sector:</strong> {{ info.sector }}</h6><br>
-                <h6><strong>Industry:</strong> {{ info.industry }}</h6><br>
-                <h6><strong>Company Summary:</strong></h6>
-                <p>{{ info.company_summary}}</p>
-            </div>
-            </div>
-        </div>
-    </div>
-
     <h3 class="text-center"><strong>{{ ticker }}</strong> is currently <strong>${{ info.price }} {{ info.currency }}</strong></h3>
     <h6 class="text-center"> 
         <u>Updated: <strong>{{ time }}</strong></u>
     </h6>
-    
+
     <div class="container mt-5">
         <p class="lead text-center">
             You have <strong>${{ available_cash }}</strong> available in cash <br>
@@ -76,6 +61,45 @@
             </div>
 
         </form>
+    </div>
+
+    <!-- History plot -->
+    <div class="my-3 w-100" id="historyPlot"></div>
+
+    <!-- Performance Summary -->
+    <h4>Performance Summary</h4>
+    <div class="table-responsive">
+        <table class="table table-striped table-dark" id="performanceTable">
+            <tr>
+                {% for key, value in performance.items() %}
+                    <th scope="col">{{ key }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for key, value in performance.items() %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+    <!-- listing details -->
+    <div class="accordion my-3" id="details">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
+                Listing Details
+            </button>
+            </h2>
+            <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
+            <div class="accordion-body">
+                <h6><strong>Sector:</strong> {{ info.sector }}</h6><br>
+                <h6><strong>Industry:</strong> {{ info.industry }}</h6><br>
+                <h6><strong>Company Summary:</strong></h6>
+                <p>{{ info.company_summary}}</p>
+            </div>
+            </div>
+        </div>
     </div>
 
 </div>

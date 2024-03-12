@@ -57,15 +57,15 @@ let renderHistoryPlot = (data) => {
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 
         font: {
-            size: 16,
+            size: 12,
             color: '#FFFFFF'
         },
 
         margin: {
             l: 40,
             r: 40,
-            b: 50,
-            t: 100,
+            b: 80,
+            t: 80,
             pad: 0
         },
 

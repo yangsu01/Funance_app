@@ -5,10 +5,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let transactionData = JSON.parse(dataContainer.getAttribute('data-transactions'))
     let holdingsData = JSON.parse(dataContainer.getAttribute('data-holdings'))
     let historyData = JSON.parse(dataContainer.getAttribute('data-history'))
+    let holdingsPieData = JSON.parse(dataContainer.getAttribute('data-holdings-pie'))
+    let sectorPieData = JSON.parse(dataContainer.getAttribute('data-sector-pie'))
+
+    let historyPlotDiv = 'historyPlot'
+    let holdingsPieChartDiv = 'holdingsPie'
+    let sectorPieChartDiv = 'sectorPie'
 
     if (holdingsData.length > 0) {
         renderTable(holdingsData, 'holdingsTable')
         populateSellDropdown(holdingsData)
+
+        renderPieChart(holdingsPieData, holdingsPieChartDiv)
+        renderPieChart(sectorPieData, sectorPieChartDiv)
     }
 
     if (transactionData.length > 0) {
@@ -16,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (historyData['Date'].length > 1) {
-        renderHistoryPlot(historyData)
+        renderHistoryPlot(historyData, historyPlotDiv)
     } else {
         document.getElementById('historyPlot').innerHTML = '<h3 class="text-center my-5">No history available yet!</h3>'
     }
@@ -36,9 +45,7 @@ let openPopup = (popupId) => {
  * creates interactive plot of portfolio performance history
  * @param {JSON} data - portfolio history  
  */
-let renderHistoryPlot = (data) => {
-    historyPlot = document.getElementById('historyPlot')
-
+let renderHistoryPlot = (data, historyPlotDiv) => {
     let x = data['Date']
     let y = data['Value']
 
@@ -53,20 +60,19 @@ let renderHistoryPlot = (data) => {
     }
 
     let layout = {
-        title: 'Portfolio Value Over Time',
         plot_bgcolor: 'rgba(0, 0, 0, 0)',
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 
         font: {
-            size: 16,
+            size: 12,
             color: '#FFFFFF'
         },
 
         margin: {
-            l: 40,
-            r: 40,
+            l: 30,
+            r: 30,
             b: 50,
-            t: 100,
+            t: 50,
             pad: 0
         },
 
@@ -89,8 +95,7 @@ let renderHistoryPlot = (data) => {
                     },
                     {step: 'all'}
                 ]
-            },
-            rangeslider: {range: [x[0], x[x.length - 1]]},
+            }
         },
 
         yaxis: {
@@ -101,9 +106,9 @@ let renderHistoryPlot = (data) => {
         }
     }
 
-    Plotly.newPlot('historyPlot', [plotData], layout).then(() => {
+    Plotly.newPlot(historyPlotDiv, [plotData], layout).then(() => {
         window.onresize = function() {
-            Plotly.Plots.resize('historyPlot')
+            Plotly.Plots.resize(historyPlotDiv)
           }
     })
 }
@@ -145,7 +150,7 @@ let renderTable = (data, tableId) => {
 /**
  * Populates the buy dropdown with tickers of holdings in the portfolio
  */
-populateSellDropdown = (data) => {
+let populateSellDropdown = (data) => {
     let dropdown = document.getElementById('sellDropdown')
     let option = document.createElement('option')
     option.text = 'Select ticker'
@@ -157,5 +162,46 @@ populateSellDropdown = (data) => {
         option.text = data['Ticker']
         option.value = data['Ticker']
         dropdown.append(option)
+    })
+}
+
+
+let renderPieChart = (data, plotDiv) => {
+
+    let plotData = [{
+        type: 'pie',
+        values: data['values'],
+        labels: data['labels'],
+        domain: {column: 0},
+        textinfo: 'label+percent',
+        hoverinfo: 'value',
+        hole: .3,
+        insidetextorientation: "radial"
+    }]
+
+    let layout = {
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+
+        font: {
+            size: 11,
+            color: '#FFFFFF'
+        },
+
+        margin: {
+            l: 20,
+            r: 20,
+            b: 50,
+            t: 50,
+            pad: 0
+        },
+
+        showlegend: false
+    };
+    
+    Plotly.newPlot(plotDiv, plotData, layout).then(() => {
+        window.onresize = function() {
+            Plotly.Plots.resize(plotDiv)
+          }
     })
 }

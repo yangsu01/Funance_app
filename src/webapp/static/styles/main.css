@@ -49,3 +49,7 @@ body {
 .holding-details{
     max-width: 500px;
 }
+
+.pie-chart{
+    max-width: 300px;
+}

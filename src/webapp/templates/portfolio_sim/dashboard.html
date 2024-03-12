@@ -12,7 +12,9 @@
         <div id="data-container"
             data-transactions="{{ transactions }}"
             data-holdings="{{ holdings }}"
-            data-history="{{ history }}">
+            data-history="{{ history }}"
+            data-holdings-pie="{{ holdings_breakdown}}"
+            data-sector-pie="{{ sector_breakdown}}">
         </div>
 
         <!-- header -->
@@ -104,19 +106,30 @@
 
         <!-- portfolio value -->
         <div class="my-4 container">
-            <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong> (${{cash_available}} in cash)</h2>
+            <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong> (${{cash_available}} cash)</h2>
+            <h4 class="text-center">All-Time Change: {{ change }}% (${{ profit }})</h4>
             <h6 class="text-center" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every 30 minutes when the market is open"> 
                 <u>Updated: <strong>{{ update_time }}</strong></u>
             </h6>
         </div>
 
         <!-- portfolio plot  -->
-        <div class="my-4 w-100" id="historyPlot" style="display: block; box-sizing: border-box; height: 400px;"></div>
+        <h4 class="text-center mt-5">Performance History</h4>
+        <div class="w-100" id="historyPlot" style="height: 400px;"></div>
         
         {% if has_holdings %}
             <!-- portfolio holdings -->
             <div class="container w-100">
-                <h4 class="mt-5">Portfolio Breakdown</h4>
+                <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center border-bottom mb-5">
+                        <h4>Sector Breakdown</h4>
+                        <div class="pie-chart" id="sectorPie" style="height: 400px;"></div>
+                        
+                        <h4>Portfolio Breakdown</h4>
+                        <div class="pie-chart" id="holdingsPie" style="height: 400px;"></div>
+                </div>
+
+                <!-- holdings table -->
+                <h4>My Holdings</h4>
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-dark" id="holdingsTable"></table>
                 </div>
