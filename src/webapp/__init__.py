@@ -39,7 +39,7 @@ def create_app():
 
     # define jobs
     def update_prices():
-        from .portfolio_sim import update_prices, update_portfolio_value, save_history
+        from .scheduler_functions import update_prices, update_portfolio_value, save_history
 
         with app.app_context():
             update_prices()
@@ -47,13 +47,13 @@ def create_app():
             save_history()
 
     def update_open():
-        from .portfolio_sim import update_opening_prices
+        from .scheduler_functions import update_opening_prices
 
         with app.app_context():
             update_opening_prices()
 
     def update_close():
-        from .portfolio_sim import update_last_close_value
+        from .scheduler_functions import update_last_close_value
 
         with app.app_context():
             update_last_close_value()

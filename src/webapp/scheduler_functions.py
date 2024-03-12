@@ -1,5 +1,4 @@
 import yfinance as yf
-from datetime import datetime
 
 from . import db
 from .data_models import Holdings, Portfolio, History
