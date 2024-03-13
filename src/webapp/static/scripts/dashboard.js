@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable(transactionData, 'transactionsTable')
     }
 
-    if (historyData['Date'].length > 1) {
+    if (historyData['date'].length > 1) {
         renderHistoryPlot(historyData, historyPlotDiv)
     } else {
         document.getElementById('historyPlot').innerHTML = '<h3 class="text-center my-5">No history available yet!</h3>'
@@ -46,14 +46,15 @@ let openPopup = (popupId) => {
  * @param {JSON} data - portfolio history  
  */
 let renderHistoryPlot = (data, historyPlotDiv) => {
-    let x = data['Date']
-    let y = data['Value']
+    let dates = data['date']
+    let values = data['value']
+
+    let indexes = dates.map((date, index) => index)
 
     let plotData = {
-        x: x,
-        y: y,
+        x: indexes,
+        y: values,
         type: 'scatter',
-        mode: 'lines',
         marker: {color: 'blue'},
         name: 'Portfolio Value',
         line: {color: '#17BECF'}
@@ -78,24 +79,11 @@ let renderHistoryPlot = (data, historyPlotDiv) => {
 
         xaxis: {
             autorange: true,
-            rangeselector: {
-                bgcolor: 'black',
-                buttons: [
-                    {
-                        count: 7,
-                        label: '1w',
-                        step: 'day',
-                        stepmode: 'backward'
-                    },
-                    {
-                        count: 1,
-                        label: '1m',
-                        step: 'month',
-                        stepmode: 'backward'
-                    },
-                    {step: 'all'}
-                ]
-            }
+            tickvals: indexes,
+            ticktext: dates,
+            tickmode: 'array',
+            showgrid: false,
+            showticklabels: false
         },
 
         yaxis: {
@@ -173,9 +161,8 @@ let renderPieChart = (data, plotDiv) => {
         values: data['values'],
         labels: data['labels'],
         domain: {column: 0},
-        textinfo: 'label+percent',
-        hoverinfo: 'value',
-        hole: .3,
+        textinfo: 'label',
+        hoverinfo: 'label+percent+value',
         insidetextorientation: "radial"
     }]
 
@@ -184,7 +171,7 @@ let renderPieChart = (data, plotDiv) => {
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 
         font: {
-            size: 11,
+            size: 10,
             color: '#FFFFFF'
         },
 

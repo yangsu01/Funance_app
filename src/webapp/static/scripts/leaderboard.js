@@ -51,20 +51,26 @@ let renderTable = (data, tableId) => {
  * @param {JSON} data - portfolio history  
  */
 let renderHistoryPlot = (data) => {
+    dates = data[0]['x']
+    let indexes = dates.map((date, index) => index)
+
+    for (let i = 0; i < data.length; i++) {
+        data[i]['x'] = indexes[i]
+    }
+
     let layout = {
-        title: 'User Portfolio Values',
+        title: 'Portfolio Performance',
         plot_bgcolor: 'rgba(0, 0, 0, 0)',
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 
         font: {
-            size: 12,
+            size: 10,
             color: '#FFFFFF'
         },
 
         margin: {
-            l: 40,
-            r: 40,
-            b: 80,
+            l: 30,
+            r: 30,
             t: 80,
             pad: 0
         },
@@ -73,7 +79,7 @@ let renderHistoryPlot = (data) => {
 
         legend: {
             x: 0,
-            y: 1,
+            y: 0,
             traceorder: 'normal',
             font: {
               family: 'sans-serif',
@@ -81,29 +87,17 @@ let renderHistoryPlot = (data) => {
               color: '#FFFFFF'
             },
             bgcolor: '#000',
-            borderwidth: 1
+            borderwidth: 1,
+            "orientation": "h"
         },
 
         xaxis: {
             autorange: true,
-            rangeselector: {
-                bgcolor: 'black',
-                buttons: [
-                    {
-                        count: 7,
-                        label: '1w',
-                        step: 'day',
-                        stepmode: 'backward'
-                    },
-                    {
-                        count: 1,
-                        label: '1m',
-                        step: 'month',
-                        stepmode: 'backward'
-                    },
-                    {step: 'all'}
-                ]
-            },
+            tickvals: indexes,
+            ticktext: dates,
+            tickmode: 'array',
+            showgrid: false,
+            showticklabels: false
         },
 
         yaxis: {
