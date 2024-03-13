@@ -7,7 +7,7 @@ import yfinance as yf
 from . import db
 from .data_models import Portfolio, Holdings, Transactions, History
 
-STARTING_FUNDS = 100000
+STARTING_FUNDS = 10000.00
 
 def get_est_time() -> datetime:
     '''Gets the current time in EST
@@ -234,8 +234,8 @@ def get_portfolio_history(portfolio_id: int) -> str:
     history = History.query.filter_by(portfolio_id=portfolio_id).all()
 
     portfolio_history = {
-        'Date': [utc_to_est(h.record_time).strftime('%Y-%m-%d %H:%M') for h in history],
-        'Value': [h.portfolio_value for h in history]
+        'date': [utc_to_est(h.record_time).strftime('%Y-%m-%d %H:%M') for h in history],
+        'value': [h.portfolio_value for h in history]
     }
 
     return json.dumps(portfolio_history)

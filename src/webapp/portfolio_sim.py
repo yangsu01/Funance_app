@@ -56,8 +56,9 @@ def dashboard():
         transactions, holdings = [], []
         holdings_breakdown, sector_breakdown = None, None
         history = get_portfolio_history(current_user.portfolio.id)
-        change = round((current_user.portfolio.updated_value/STARTING_FUNDS - 1) * 100, 2)
-        profit = round(current_user.portfolio.updated_value - STARTING_FUNDS, 2)
+        portfolio_value = current_user.portfolio.updated_value
+        change = round((portfolio_value/STARTING_FUNDS - 1) * 100, 2)
+        profit = round(portfolio_value - STARTING_FUNDS, 2)
         update_time = utc_to_est(current_user.portfolio.updated_time).strftime('%a, %b %d. %Y %I:%M%p') + ' EST'
 
         if has_holdings:
@@ -74,7 +75,7 @@ def dashboard():
                         username=current_user.username, 
                         portfolio_exists=portfolio_exists, 
                         update_time=update_time,
-                        portfolio_value=current_user.portfolio.updated_value,
+                        portfolio_value=portfolio_value,
                         has_holdings=has_holdings, 
                         has_transactions=has_transactions, 
                         transactions=transactions,
