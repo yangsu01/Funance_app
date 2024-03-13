@@ -9,28 +9,28 @@
     <h6 class="text-center"> 
         <u>Updated: <strong>{{ time }}</strong></u>
     </h6>
-
-    <!-- holding details -->
-    <div class="accordion my-4" id="details">
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
-                    Holding Details
-                </button>
-            </h2>
-            <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
-                <div class="accordion-body">
-                    <ul class="list-group">
-                        {% for key, value in details.items() %}
-                            <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
-                        {% endfor %}
-                    </ul>
+        
+    <div class="container my-3 holding-details">
+        <!-- holding details -->
+        <div class="accordion my-4" id="details">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#listingDetails" aria-expanded="true" aria-controls="listingDetails">
+                        Holding Performance
+                    </button>
+                </h2>
+                <div id="listingDetails" class="accordion-collapse collapse" data-bs-parent="#details">
+                    <div class="accordion-body">
+                        <ul class="list-group">
+                            {% for key, value in details.items() %}
+                                <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-        
-    <div class="container my-3 holding-details">
+
         <p class="lead text-center">
             You own <strong>{{ info.shares }}</strong> shares <br> how many would you like to sell?
         </p>
