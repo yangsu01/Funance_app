@@ -7,3 +7,4 @@ yfinance==0.2.36
 flask-apscheduler==1.13.1
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
+markdown==3.5.2
