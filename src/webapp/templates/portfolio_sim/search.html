@@ -12,7 +12,7 @@
     <div class="mb-4 border-bottom">
         <div class="d-flex justify-content-between mb-4">
             <form method="POST">
-                <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
+                <a type="button" class="btn btn-outline-secondary" href="{{ url_for('portfolio_sim.dashboard') }}">Back</a>
                 <input type="hidden" name="buyTicker" value="{{ ticker }}">
                 <button type="submit" class="btn btn-success">Buy {{ ticker }}</button>
             </form>
@@ -20,7 +20,7 @@
             <form method="POST">
                 <div class="input-group">
                     <input type="hidden" name="originalTicker" value="{{ ticker }}">
-                    <input type="text" class="form-control" size="5" placeholder="Ticker" aria-label="Search Ticker" id="searchTicker" name="searchTicker" required>
+                    <input type="text" class="form-control rounded" size="5" placeholder="Ticker" aria-label="Search Ticker" id="searchTicker" name="searchTicker" required>
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary" type="submit">Search</button>
                     </div>
