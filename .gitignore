@@ -165,3 +165,7 @@ testing.ipynb
 # migrations
 migrations/
 
+# blogs
+blogs/
+save_blog.py
+
