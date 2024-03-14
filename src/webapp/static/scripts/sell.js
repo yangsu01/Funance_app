@@ -3,7 +3,7 @@
  */
 let validateSell = () => {
     let numShares = Number(document.getElementById('shares').value)
-    let maxShares = Number(document.getElementById('sellForm').getAttribute('data-max-shares'))
+    let maxShares = Number(document.getElementById('sharesOwned'))
     let ticker = document.getElementById('ticker').value
     let price = Number(document.getElementById('price').value)
 
