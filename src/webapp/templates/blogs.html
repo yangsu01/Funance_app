@@ -25,7 +25,7 @@
             <ol class="list-unstyled">
                 {% for item in blog_catalog %}
                     {% if item.file_name != blog.file_name %}
-                        <li><a href="/blogs/{{ item.file_name }}">{{ item.title }}</a></li>
+                        <li><a href="{{ url_for('blogs.blog', file_name=item.file_name) }}">{{ item.title }}</a></li>
                     {% endif %}
                 {% endfor %}
             </ol>
