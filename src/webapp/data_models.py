@@ -39,8 +39,8 @@ class Holdings(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
     company_name = db.Column(db.String(150), nullable=False)
     ticker = db.Column(db.String(10), nullable=False)
-    industry = db.Column(db.String(150), default='Unknown')
-    sector = db.Column(db.String(150), default='Unknown')
+    industry = db.Column(db.String(150), nullable=False)
+    sector = db.Column(db.String(150), nullable=False)
     number_of_shares = db.Column(db.Integer, nullable=False)
     average_price = db.Column(db.Float, nullable=False)
     updated_price = db.Column(db.Float, nullable=False)
@@ -69,4 +69,12 @@ class History(db.Model):
     record_time = db.Column(db.DateTime(timezone=True), nullable=False)
     portfolio_value = db.Column(db.Float, nullable=False)
 
-
+# blog posts data
+class Blog(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    file_name = db.Column(db.String(255), nullable=False, unique=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    creation_date = db.Column(db.Date, nullable=False)
+    updated_date = db.Column(db.Date, nullable=False)
