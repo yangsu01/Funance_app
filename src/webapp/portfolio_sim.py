@@ -5,11 +5,11 @@ import yfinance as yf
 
 from .portfolio_sim_functions import *
 
-sim = Blueprint('sim', __name__)
+portfolio_sim = Blueprint('portfolio_sim', __name__)
 
 
 # routes
-@sim.route('/dashboard', methods=['GET', 'POST'])
+@portfolio_sim.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     if request.method == 'POST':
@@ -23,7 +23,7 @@ def dashboard():
                 ticker_info = yf.Ticker(ticker).info
                 
                 if 'currentPrice' in ticker_info:
-                    return redirect(url_for('sim.buy_stock', ticker=ticker))
+                    return redirect(url_for('portfolio_sim.buy_stock', ticker=ticker))
                 else:
                     flash(f'Cannot find ticker {ticker}', category='error')
             except:
@@ -32,7 +32,7 @@ def dashboard():
         elif 'sellDropdown' in request.form:
             ticker = request.form['sellDropdown']
             if ticker:
-                return redirect(url_for('sim.sell_stock', ticker=ticker))
+                return redirect(url_for('portfolio_sim.sell_stock', ticker=ticker))
             else:
                 flash(f'Please select a stock to sell', category='error')
         # search stock form
@@ -42,7 +42,7 @@ def dashboard():
                 ticker_info = yf.Ticker(ticker).info
                 
                 if 'currentPrice' in ticker_info:
-                    return redirect(url_for('sim.search_stock', ticker=ticker))
+                    return redirect(url_for('portfolio_sim.search_stock', ticker=ticker))
                 else:
                     flash(f'Cannot find ticker {ticker}', category='error')
             except:
@@ -94,13 +94,13 @@ def dashboard():
                         )
 
 
-@sim.route('/rules', methods=['GET'])
+@portfolio_sim.route('/rules', methods=['GET'])
 def rules():
 
     return render_template("portfolio_sim/rules.html", user=current_user, starting_funds=STARTING_FUNDS)
 
 
-@sim.route('/buy_stock/<ticker>', methods=['GET', 'POST'])
+@portfolio_sim.route('/buy_stock/<ticker>', methods=['GET', 'POST'])
 @login_required
 def buy_stock(ticker: str):
     if request.method == 'POST':
@@ -118,7 +118,7 @@ def buy_stock(ticker: str):
 
         flash(f'Transaction complete!', category='success')
 
-        return redirect(url_for('sim.dashboard'))
+        return redirect(url_for('portfolio_sim.dashboard'))
 
     info = get_stock_info(ticker)
 
@@ -159,7 +159,7 @@ def buy_stock(ticker: str):
                             performance=performance)
 
 
-@sim.route('/sell_stock/<ticker>', methods=['GET', 'POST'])
+@portfolio_sim.route('/sell_stock/<ticker>', methods=['GET', 'POST'])
 @login_required
 def sell_stock(ticker: str):
     if request.method == 'POST':
@@ -175,7 +175,7 @@ def sell_stock(ticker: str):
 
         flash(f'Transaction complete!', category='success')
 
-        return redirect(url_for('sim.dashboard'))
+        return redirect(url_for('portfolio_sim.dashboard'))
 
     current_price = get_current_price(ticker)
     info = get_holding(current_user.portfolio.id, ticker)
@@ -189,7 +189,7 @@ def sell_stock(ticker: str):
                            time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST')
 
 
-@sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
+@portfolio_sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
 @login_required
 def search_stock(ticker: str):
     if request.method == 'POST':
@@ -200,17 +200,17 @@ def search_stock(ticker: str):
                 ticker_info = yf.Ticker(ticker).info
                 
                 if 'currentPrice' in ticker_info:
-                    return redirect(url_for('sim.search_stock', ticker=ticker))
+                    return redirect(url_for('portfolio_sim.search_stock', ticker=ticker))
                 else:
                     flash(f'Cannot find ticker {ticker}', category='error')
-                    return redirect(url_for('sim.search_stock', ticker=og_ticker))
+                    return redirect(url_for('portfolio_sim.search_stock', ticker=og_ticker))
 
             except:
                 flash(f'Cannot find ticker {ticker}', category='error')
-                return redirect(url_for('sim.search_stock', ticker=og_ticker))
+                return redirect(url_for('portfolio_sim.search_stock', ticker=og_ticker))
         elif 'buyTicker' in request.form:
             ticker = request.form['buyTicker']
-            return redirect(url_for('sim.buy_stock', ticker=ticker))
+            return redirect(url_for('portfolio_sim.buy_stock', ticker=ticker))
     
     info = get_stock_info(ticker)
     stock_info = {
@@ -240,12 +240,12 @@ def search_stock(ticker: str):
                            info=stock_info, 
                            performance=performance,
                            ticker=ticker, 
-                           time=get_est_time().strftime('%A, %B %d. %Y %I:%M%p') + ' EST',
+                           time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST',
                            history=history,
                            news=news)
 
 
-@sim.route('/leaderboard', methods=['GET'])
+@portfolio_sim.route('/leaderboard', methods=['GET'])
 def leaderboard():
     try:
         top_performers = get_top_performers()

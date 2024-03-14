@@ -10,7 +10,7 @@ from .data_models import User
 auth = Blueprint('auth', __name__)
 
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route('/sign_in', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -30,10 +30,10 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template("authentication/login.html", user=current_user)
+    return render_template("authentication/sign_in.html", user=current_user)
 
 
-@auth.route('/logout')
+@auth.route('/sign_out')
 @login_required
 def logout():
     logout_user()
@@ -41,7 +41,7 @@ def logout():
     return redirect(url_for('views.home'))
 
 
-@auth.route('/sign-up', methods=['GET', 'POST'])
+@auth.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
         email = request.form.get('email')
