@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - {{ blog.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-9 border-bottom">
+        <div class="mb-4 border-bottom">
+            <h2 class="display-5 fw-bold text-white">{{ blog.title }}</h2>
+            <p><i>Created on: {{ blog.creation_date }}</i></p>
+
+            <p>{{ blog.description }}</p>
+        </div>
+
+        <div class="container">
+            {{ blog.content|safe }}
+
+            <p class="mt-5"><i>Last updated: {{ blog.update_date }}</i></p>
+        </div>
+    </div>
+
+    <aside class="col-md-3 mt-5">
+        <div class="p-3 border rounded">
+            <h4>Other Blogs</h4>
+            <ol class="list-unstyled">
+                {% for item in blog_catalog %}
+                    {% if item.file_name != blog.file_name %}
+                        <li><a href="/blogs/{{ item.file_name }}">{{ item.title }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        </div>
+    </aside>
+</div>
+{% endblock %}
