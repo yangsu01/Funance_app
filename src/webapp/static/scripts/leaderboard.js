@@ -59,7 +59,13 @@ let renderHistoryPlot = (data) => {
     }
 
     let layout = {
-        title: 'Portfolio Performance',
+        title: {
+            text: 'Portfolio Performance',
+            font: {
+                size: 18,
+                color: '#FFFFFF'
+            }
+        },
         plot_bgcolor: 'rgba(0, 0, 0, 0)',
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 

@@ -2,41 +2,42 @@
 
 {% block title %}{{ticker}} History{% endblock %} 
 
+{% block data %}
+    data-ticker="{{ ticker }}"
+    data-history="{{ history }}"
+{% endblock %}
+
 {% block content%}
-    <!-- data -->
-    <div id="data-container"
-        data-ticker="{{ ticker }}"
-        data-history="{{ history }}">
-    </div>
-
-<!-- Header buttons -->
-<div class="container my-5 content-container">
-    <div class="d-flex justify-content-between mb-5">
-        <form method="POST">
-            <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
-            <input type="hidden" name="buyTicker" value="{{ ticker }}">
-            <button type="submit" class="btn btn-success">Buy {{ ticker }}</button>
-        </form>
-
-        <form method="POST">
-            <div class="input-group">
-                <input type="hidden" name="originalTicker" value="{{ ticker }}">
-                <input type="text" class="form-control" size="1" placeholder="Ticker" aria-label="Search Ticker" id="searchTicker" name="searchTicker" required>
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+    <!-- Header -->
+    <div class="mb-4 border-bottom">
+        <div class="d-flex justify-content-between mb-4">
+            <form method="POST">
+                <a type="button" class="btn btn-outline-secondary" href="/dashboard">Back</a>
+                <input type="hidden" name="buyTicker" value="{{ ticker }}">
+                <button type="submit" class="btn btn-success">Buy {{ ticker }}</button>
+            </form>
+    
+            <form method="POST">
+                <div class="input-group">
+                    <input type="hidden" name="originalTicker" value="{{ ticker }}">
+                    <input type="text" class="form-control" size="5" placeholder="Ticker" aria-label="Search Ticker" id="searchTicker" name="searchTicker" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
                 </div>
-            </div>
-        </form>   
+            </form>   
+        </div>
+        
+        <h1 class="display-5 fw-bold text-white text-center"><strong>{{ info.company_name }}</strong> <br></h1>
     </div>
 
-    <h1 class="text-center"><strong>{{ info.company_name }}</strong> <br></h1>
     <h3 class="text-center"><strong>{{ ticker }}</strong> is currently <strong>${{ info.price }} {{ info.currency }}</strong></h3>
     <h6 class="text-center"> 
         <u>Updated: <strong>{{ time }}</strong></u>
     </h6>
 
     <!-- History plot -->
-    <div class="my-3 w-100" id="historyPlot"></div>
+    <div class="my-3" id="historyPlot"></div>
 
     <!-- Performance Summary -->
     <h4>Performance Summary</h4>
@@ -80,8 +81,6 @@
             </div>
         </div>
     </div>
-    
-</div>
 {% endblock %}
 
 {% block scripts %}

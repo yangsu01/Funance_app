@@ -6,21 +6,22 @@
 
 {% block title %}My Dashboard{% endblock %} 
 
+{% block data %}
+    {% if portfolio_exists %}
+        data-transactions="{{ transactions }}"
+        data-holdings="{{ holdings }}"
+        data-history="{{ history }}"
+        data-holdings-pie="{{ holdings_breakdown}}"
+        data-sector-pie="{{ sector_breakdown}}"
+    {% endif %}
+{% endblock %}
+
 {% block content%}
     {% if portfolio_exists %}
-        <!-- data -->
-        <div id="data-container"
-            data-transactions="{{ transactions }}"
-            data-holdings="{{ holdings }}"
-            data-history="{{ history }}"
-            data-holdings-pie="{{ holdings_breakdown}}"
-            data-sector-pie="{{ sector_breakdown}}">
-        </div>
-
         <!-- header -->
-        <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h1">{{ username }}'s Portfolio</h1>
-            <div class="btn-toolbar mb-2 mb-md-0 button-container">
+        <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center border-bottom">
+            <h1 class="display-5 fw-bold text-white text-center">{{ username }}'s Portfolio</h1>
+            <div class="btn-toolbar mb-3 button-container">
                 <button type="button" class="btn btn-outline-secondary" onclick="openPopup('buyPopup')">Buy</button>
                 <!-- buy popup -->
                 <div class="modal" id="buyPopup">
@@ -105,7 +106,7 @@
         </div>
 
         <!-- portfolio value -->
-        <div class="my-4 container">
+        <div class="my-4">
             <h2 class="text-center">Your portfolio is worth <strong>${{ portfolio_value }}</strong> (${{cash_available}} cash)</h2>
             <h4 class="text-center">All-Time Change: {{ change }}% (${{ profit }})</h4>
             <h6 class="text-center" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every 30 minutes when the market is open"> 
@@ -115,15 +116,13 @@
 
         <!-- portfolio plot  -->
         <h4 class="text-center mt-5">Performance History</h4>
-        <div class="w-100" id="historyPlot" style="height: 400px;"></div>
+        <div id="historyPlot"></div>
         
         {% if has_holdings %}
             <!-- portfolio holdings -->
-            <div class="d-flex justify-content-around flex-wrap align-items-center border-bottom mb-5 w-100">
-                <h4>Sector Breakdown</h4>
+            <div class="d-flex justify-content-around flex-wrap align-items-center border-bottom mb-5">
                 <div class="pie-chart" id="sectorPie"></div>
                 
-                <h4>Portfolio Breakdown</h4>
                 <div class="pie-chart" id="holdingsPie"></div>
             </div>
 
@@ -136,17 +135,15 @@
 
         {% if has_transactions %}
             {% if not has_holdings %}
-                <h3 class="text-center mt-5 mb-5">Your portfolio does not have any holdings!</h3>
+                <h3 class="text-center my-5">Your portfolio does not have any holdings!</h3>
             {% endif %}
             <!-- transaction history -->
-            <div class="container w-100">
-                <h4 class="mt-5">Transaction History</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-dark" id="transactionsTable"></table>
-                </div>
+            <h4 class="mt-5">Transaction History</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-dark" id="transactionsTable"></table>
             </div>
         {% else %}
-            <h1 class="text-center mt-5 mb-5">Buy something first to track your portfolio!</h1>
+            <h1 class="text-center my-5">Buy something first to track your portfolio!</h1>
         {% endif %}
     {% else %}
         <!-- prompt user to create portfolio -->
@@ -154,7 +151,7 @@
             <h1 class="display-5 fw-bold text-body-emphasis">Hi, {{ username }}</h1>
             <div class="col-lg-6 mx-auto">
                 <p class="lead mb-4">Looks like you don't have a portfolio yet! Dont worry, just create a profile and start having FUN(ance). Or, feel free to get more familiar with the rules first.</p>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center border-bottom">
                     <a type="button" class="btn btn-outline-secondary btn-lg px-4 mr-3" id="rules" href="/rules">Game Rules</a>
                     <form method="POST">
                         <input type="hidden" name="create_portfolio" value="create user portfolio">

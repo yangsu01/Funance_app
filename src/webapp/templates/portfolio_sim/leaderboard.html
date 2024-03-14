@@ -2,36 +2,37 @@
 
 {% block title %}Leaderboard{% endblock %} 
 
-{% block content%}
-    <!-- data -->
-    <div id="data-container"
-        data-top-performers="{{ top_performers }}"
-        data-daily-performers="{{ top_daily_performers }}"
-        data-history="{{ performance_history }}">
-    </div>
+{% block data %}
+    data-top-performers="{{ top_performers }}"
+    data-daily-performers="{{ top_daily_performers }}"
+    data-history="{{ performance_history }}"
+{% endblock %}
 
-    <div class="container my-5 content-container">
-        <h1 class="text-body-emphasis text-center">- Leaderboard -</h1>
-        <h6 class="text-center" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every 30 minutes when the market is open"> 
+{% block content%}
+    <!-- header -->
+    <div class="border-bottom mb-4">
+        <h1 class="display-5 fw-bold text-white text-center">- Leaderboard -</h1>
+        <h6 class="text-center mb-3" data-toggle="tooltip" data-placement="bottom" title="Portfolio values are updated every 30 minutes when the market is open"> 
             <u>Updated: <strong>{{ update_time }}</strong></u>
         </h6>
+    </div>
 
-        <div class="w-100 mt-3" id="historyPlot" style="height: 400px;"></div>
 
-        <div class="container w-100 my-4">
-            <h4>Top Performing Portfolios</h4>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-dark" id="topPerformersTable"></table>
-            </div>
+    <!-- history plot -->
+    <div id="historyPlot" style="height: 400px;"></div>
+
+    <div class="my-4">
+        <h4>Top Performing Portfolios</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-dark" id="topPerformersTable"></table>
         </div>
+    </div>
 
-        <div class="container w-100 my-4">
-            <h4>Todays Top Growers</h4>
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-dark" id="dailyPerformersTable"></table>
-            </div>
+    <div class="my-4">
+        <h4>Todays Top Growers</h4>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-dark" id="dailyPerformersTable"></table>
         </div>
-        
     </div>
 {% endblock %}
 

@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTable(holdingsData, 'holdingsTable')
         populateSellDropdown(holdingsData)
 
-        renderPieChart(holdingsPieData, holdingsPieChartDiv)
-        renderPieChart(sectorPieData, sectorPieChartDiv)
+        renderPieChart(holdingsPieData, holdingsPieChartDiv, 'Holdings Breakdown')
+        renderPieChart(sectorPieData, sectorPieChartDiv, 'Sector Breakdown')
     }
 
     if (transactionData.length > 0) {
@@ -154,7 +154,7 @@ let populateSellDropdown = (data) => {
 }
 
 
-let renderPieChart = (data, plotDiv) => {
+let renderPieChart = (data, plotDiv, title) => {
 
     let plotData = [{
         type: 'pie',
@@ -167,6 +167,12 @@ let renderPieChart = (data, plotDiv) => {
     }]
 
     let layout = {
+        title: {
+            text: title,
+            font: {
+                size: 16
+            }
+        },
         plot_bgcolor: 'rgba(0, 0, 0, 0)',
         paper_bgcolor: 'rgba(0, 0, 0, 0)',
 
@@ -179,7 +185,7 @@ let renderPieChart = (data, plotDiv) => {
             l: 20,
             r: 20,
             b: 50,
-            t: 50,
+            t: 100,
             pad: 0
         },
 
