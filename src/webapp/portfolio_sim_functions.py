@@ -46,6 +46,13 @@ def create_portfolio(user_id: int) -> None:
     db.session.add(portfolio)
     db.session.commit()
 
+    history = History(portfolio_id=portfolio.id, 
+                      record_time=get_est_time(), 
+                      portfolio_value=STARTING_FUNDS)
+    
+    db.session.add(history)
+    db.session.commit()
+
 
 def get_stock_info(ticker: str) -> dict:
     '''Gets custom stock information from yfinance
