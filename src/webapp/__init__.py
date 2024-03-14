@@ -3,11 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
 import os
-from dotenv import load_dotenv
-from flask_migrate import Migrate
-
-load_dotenv()
-DEV_DB = os.environ.get('DEV_DB_URI')
 
 db = SQLAlchemy()
 
@@ -20,14 +15,12 @@ def create_app():
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = 'spooky secret'
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD', DEV_DB)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD')
 
     # Disable tracking modifications to avoid a warning
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     db.init_app(app)
-
-    migrate = Migrate(app, db)
 
     # register blueprints 
     from .views import views
