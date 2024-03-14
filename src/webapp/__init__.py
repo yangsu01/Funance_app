@@ -3,10 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
 import os
+from dotenv import load_dotenv
+from flask_migrate import Migrate
+
+load_dotenv()
+DEV_DB = os.environ.get('DEV_DB_URI')
 
 db = SQLAlchemy()
-DB_NAME = "data.db"
-
 
 class Config:
     SCHEDULER_API_ENABLED = True
@@ -17,21 +20,25 @@ def create_app():
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = 'spooky secret'
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD', f'sqlite:///{DB_NAME}')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD', DEV_DB)
 
     # Disable tracking modifications to avoid a warning
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     db.init_app(app)
 
+    migrate = Migrate(app, db)
+
     # register blueprints 
     from .views import views
     from .auth import auth
-    from .portfolio_sim import sim
+    from .portfolio_sim import portfolio_sim
+    from .blogs import blogs
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
-    app.register_blueprint(sim, url_prefix='/')
+    app.register_blueprint(portfolio_sim, url_prefix='/')
+    app.register_blueprint(blogs, url_prefix='/')
 
     # initiate scheduler
     scheduler = APScheduler()
