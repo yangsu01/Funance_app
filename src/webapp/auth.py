@@ -11,7 +11,7 @@ auth = Blueprint('auth', __name__)
 
 
 @auth.route('/sign_in', methods=['GET', 'POST'])
-def login():
+def sign_in():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -30,12 +30,14 @@ def login():
         else:
             flash('Email does not exist.', category='error')
 
-    return render_template("authentication/sign_in.html", user=current_user)
+    return render_template("authentication/sign_in.html",
+                           user=current_user,
+                           active_page='sign_in')
 
 
 @auth.route('/sign_out')
 @login_required
-def logout():
+def sign_out():
     logout_user()
 
     return redirect(url_for('views.home'))
@@ -74,4 +76,6 @@ def sign_up():
 
             return redirect(url_for('views.home'))
 
-    return render_template("authentication/sign_up.html", user=current_user)
+    return render_template("authentication/sign_up.html",
+                           user=current_user,
+                           active_page='sign_up')

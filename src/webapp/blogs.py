@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, redirect
+from flask import Blueprint, render_template
 from flask_login import current_user
 from markdown import markdown
 
@@ -25,7 +25,8 @@ def blogs_list():
 
     return render_template('blogs_list.html',
                            blog_info=blog_info,
-                           user=current_user)
+                           user=current_user,
+                           active_page='blogs_list')
 
 
 @blogs.route('/blogs/<file_name>', methods=['GET'])
@@ -54,4 +55,5 @@ def blog(file_name):
     return render_template('blogs.html',
                            blog=blog_data,
                            blog_catalog=blog_catalog,
-                           user=current_user)
+                           user=current_user,
+                           active_page='blog')

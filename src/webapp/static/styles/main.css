@@ -53,3 +53,8 @@ body {
 .pie-chart{
     max-width: 450px;
 }
+
+.nav-item.active {
+    background-color: #007bff; /* Change to your desired active color */
+    color: #ffffff; /* Change to your desired text color */
+}

@@ -85,19 +85,23 @@ def dashboard():
                         holdings_breakdown=holdings_breakdown,
                         sector_breakdown=sector_breakdown,
                         change=change,
-                        profit=profit)
+                        profit=profit,
+                        active_page='dashboard')
 
     return render_template("portfolio_sim/dashboard.html", 
                         user=current_user, 
                         username=current_user.username, 
                         portfolio_exists=portfolio_exists,
-                        )
+                        active_page='dashboard')
 
 
 @portfolio_sim.route('/rules', methods=['GET'])
 def rules():
 
-    return render_template("portfolio_sim/rules.html", user=current_user, starting_funds=STARTING_FUNDS)
+    return render_template("portfolio_sim/rules.html", 
+                           user=current_user, 
+                           starting_funds=STARTING_FUNDS,
+                           active_page='rules')
 
 
 @portfolio_sim.route('/buy_stock/<ticker>', methods=['GET', 'POST'])
@@ -156,7 +160,8 @@ def buy_stock(ticker: str):
                             available_cash=available_cash,
                             max_shares=max_shares,
                             history=history,
-                            performance=performance)
+                            performance=performance,
+                            active_page='buy')
 
 
 @portfolio_sim.route('/sell_stock/<ticker>', methods=['GET', 'POST'])
@@ -186,7 +191,8 @@ def sell_stock(ticker: str):
                            info=info,
                            details=details, 
                            current_price=current_price,
-                           time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST')
+                           time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST',
+                           active_page='sell')
 
 
 @portfolio_sim.route('/search_stock/<ticker>', methods=['GET', 'POST'])
@@ -242,7 +248,8 @@ def search_stock(ticker: str):
                            ticker=ticker, 
                            time=get_est_time().strftime('%a, %b %d. %Y %I:%M%p') + ' EST',
                            history=history,
-                           news=news)
+                           news=news,
+                           active_page='search')
 
 
 @portfolio_sim.route('/leaderboard', methods=['GET'])
@@ -258,7 +265,8 @@ def leaderboard():
                             top_performers=top_performers,
                             top_daily_performers=top_daily_performers,
                             performance_history=performance_history,
-                            update_time=update_time)
+                            update_time=update_time,
+                            active_page='leaderboard')
     except:
         flash(f'There is no leaderboard yet', category='error')
         return redirect(url_for('views.home'))
