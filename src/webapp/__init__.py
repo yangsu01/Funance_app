@@ -15,7 +15,7 @@ def create_app():
     app.config.from_object(Config)
     app.config['SECRET_KEY'] = 'spooky secret'
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_PASSWORD', 'sqlite:///db.sqlite')
 
     # Disable tracking modifications to avoid a warning
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -26,12 +26,12 @@ def create_app():
     from .views import views
     from .auth import auth
     from .portfolio_sim import portfolio_sim
-    from .blogs import blogs
+    from .blog import blog
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(portfolio_sim, url_prefix='/')
-    app.register_blueprint(blogs, url_prefix='/')
+    app.register_blueprint(blog, url_prefix='/')
 
     # initiate scheduler
     scheduler = APScheduler()
