@@ -97,7 +97,7 @@ def create_app():
     from .data_models import User
 
     login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'auth.sign_in'
     login_manager.init_app(app)
 
     @login_manager.user_loader
