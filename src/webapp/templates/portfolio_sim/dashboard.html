@@ -145,17 +145,18 @@
         {% else %}
             <h1 class="text-center my-5">Buy something first to track your portfolio!</h1>
         {% endif %}
+        
     {% else %}
         <!-- prompt user to create portfolio -->
         <div class="px-4 py-5 my-5 text-center">
             <h1 class="display-5 fw-bold text-body-emphasis">Hi, {{ username }}</h1>
             <div class="col-lg-6 mx-auto">
                 <p class="lead mb-4">Looks like you don't have a portfolio yet! Dont worry, just create a profile and start having FUN(ance). Or, feel free to get more familiar with the rules first.</p>
-                <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center border-bottom">
+                <div class="d-flex justify-content-around flex-wrap flex-md-nowrap align-items-center">
                     <a type="button" class="btn btn-outline-secondary btn-lg px-4 mr-3" id="rules" href="{{ url_for('portfolio_sim.rules') }}">Game Rules</a>
                     <form method="POST">
                         <input type="hidden" name="create_portfolio" value="create user portfolio">
-                        <button type="submit" class="btn btn-info btn-lg px-4 gap-3" id="createProfile">Create Profile</button>
+                        <button type="submit" class="btn btn-success btn-lg px-4 gap-3" id="createProfile">Create Profile</button>
                     </form>
                 </div>
             </div>
