@@ -1,5 +1,5 @@
-# Funance_app
-finance webapp
+# Funance_app_legacy
+Legacy version of Funance.
 
 ## Installation
 Dependencies for this project are installed in a virtual environment.
